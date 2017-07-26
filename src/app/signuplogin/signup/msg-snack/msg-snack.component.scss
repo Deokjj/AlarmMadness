@@ -1,0 +1,31 @@
+@import "~assets/colors.scss";
+section{
+  color: $pink600;
+  font-size: 1.25em;
+  text-align: center;
+}
+p{
+  margin: 7px;
+}
+.firstLine{
+}
+.secondLine{
+  margin-top: 10px;
+}
+.buttonCol{
+  height: 100%;
+  padding: 0;
+}
+span{
+  padding: 0;
+  margin: 0;
+  padding-left: 20px;
+}
+._hidden{
+  visibility: hidden;
+  width: 0;
+  display: none;
+}
+b{
+  font-weight: 400;
+}

@@ -1,0 +1,219 @@
+<app-background>
+</app-background>
+<section *ngIf='launched'>
+
+<div class="camera">
+  <!-- <h2 *ngIf='launched' class="camIntro">Now look at the camera <i class="material-icons">face</i></h2> -->
+  <div class="cameraTopPadding"></div>
+  <app-camera class="webcamComp"></app-camera>
+</div>
+
+</section>
+
+<!-- *** Sign Up View ***-->
+<section *ngIf='!loggedIn && toSignInBoolean' class="signUp">
+  <div class="intro" *ngIf='!launched'>
+    <h1 color="primary">How do you feel?</h1>
+    <h2>Let me guess..Make a face expression.</h2>
+    <button md-raised-button color="primary" class="buttonToCamera" (click) = "readyClick()">I Am Ready!</button>
+  </div>
+
+
+  <md-spinner *ngIf="launched && progress"></md-spinner>
+
+  <!-- [style.background-image]="base64?'url('+base64+')':null" -->
+
+
+
+  <form (ngSubmit)="signUp()" *ngIf="proceedToSignUpBoolean">
+
+    <md-input-container class="input-width">
+      <input mdInput type="text" placeholder="Name" [formControl]="nameFormControl"
+       [(ngModel)]="nameInput" name="nameInput" >
+      <md-error *ngIf="nameFormControl.hasError('pattern')">
+        Please enter a valid name - no special characters or number
+      </md-error>
+      <md-error *ngIf="nameFormControl.hasError('required')">
+        Name is <strong>required</strong>
+      </md-error>
+      <md-error *ngIf="nameFormControl.hasError('minlength') || nameFormControl.hasError('maxlength')">
+        Name must be 3-20 characters
+      </md-error>
+    </md-input-container>
+
+    <md-input-container class="input-width">
+      <input mdInput type="password" placeholder="Password" [formControl]="passwordFormControl"
+       [(ngModel)]="passwordInput" name="passwordInput">
+      <md-error *ngIf="passwordFormControl.hasError('required')">
+        Password is <strong>required</strong>
+      </md-error>
+      <md-error *ngIf="passwordFormControl.hasError('minlength')">
+        Password must be at least 4 characters long
+      </md-error>
+      <md-error *ngIf="passwordFormControl.hasError('maxlength')">
+        Password can't be longer than 20 characters
+      </md-error>
+    </md-input-container>
+
+    <button md-raised-button class= "signUpBtn"
+    [disabled]="nameFormControl.errors || passwordFormControl.errors">
+      <span
+      [mdTooltip]="(nameFormControl.errors || passwordFormControl.errors) ?
+      'Complete the form to Sign Up!' : null">
+        Sign Up
+      </span>
+    </button>
+
+  </form>
+
+
+  <a md-button class="routeToLoginBtn" *ngIf="!launched" (click) = "signAndLogToggle()">To Log In..</a>
+
+</section>
+
+
+<!-- *** LogIn View *** -->
+<section *ngIf="!loggedIn && !toSignInBoolean" class="login">
+
+  <form (ngSubmit)="logIn()">
+
+    <md-input-container class="input-width">
+      <input mdInput type="text" placeholder="Name" [formControl]="nameFormControl"
+       [(ngModel)]="nameInput" name="nameInput" >
+      <md-error *ngIf="nameFormControl.hasError('pattern')">
+        Please enter a valid name - no special characters or number
+      </md-error>
+      <md-error *ngIf="nameFormControl.hasError('required')">
+        Name is <strong>required</strong>
+      </md-error>
+      <md-error *ngIf="nameFormControl.hasError('minlength') || nameFormControl.hasError('maxlength')">
+        Name must be 3-20 characters
+      </md-error>
+    </md-input-container>
+
+    <md-input-container class="input-width">
+      <input mdInput type="password" placeholder="Password" [formControl]="passwordFormControl"
+       [(ngModel)]="passwordInput" name="passwordInput">
+      <md-error *ngIf="passwordFormControl.hasError('required')">
+        Password is <strong>required</strong>
+      </md-error>
+      <md-error *ngIf="passwordFormControl.hasError('minlength')">
+        Password must be at least 4 characters long
+      </md-error>
+      <md-error *ngIf="passwordFormControl.hasError('maxlength')">
+        Password can't be longer than 20 characters
+      </md-error>
+    </md-input-container>
+
+    <button md-raised-button class= "logInBtn"
+    [disabled]="nameFormControl.errors || passwordFormControl.errors">
+      <span
+      [mdTooltip]="(nameFormControl.errors || passwordFormControl.errors) ?
+      'Complete the form to Log In!' : null">
+        Log In
+      </span>
+    </button>
+
+  </form>
+
+  <a md-button class="routeToSignUpBtn" (click)="signAndLogToggle()">To Sign Up..</a>
+
+</section>
+
+
+
+<section *ngIf="loggedIn && toAlarmBoolean" class="alarmView">
+
+  <md-sidenav-container class="side-container">
+    <md-sidenav #sidenav class="sidenav">
+      <button md-button>&nbsp;
+        <i class="material-icons">alarm</i>
+        <span>Alarm</span>
+      </button>
+      <button md-button>&nbsp;
+        <i class="material-icons">face</i>
+        Feed
+      </button>
+      <button md-button (click)="logOut()">
+        <i class="material-icons">subdirectory_arrow_left</i>&nbsp;
+        Log Out
+      </button>
+
+    </md-sidenav>
+
+    <div class="sideBar">
+      <button type="button" md-button (click)="sidenav.open()">
+        <i class="material-icons">menu</i>
+      </button>
+    </div>
+
+  </md-sidenav-container>
+
+  <div class="currentClock">
+
+    {{ now | date:"hh"}}<span>:</span>{{ now | date:"mm"}}<span>:</span>{{ now | date:"ss"}}<span class="smaller"> {{ now | date:'a'}}</span>
+
+  </div>
+
+  <form class="alarmInterface">
+    <md-grid-list cols="2" rowHeight="4.5:1">
+      <md-grid-tile>
+          <label for="checkbox" class="iconsLabel"><i class="material-icons">alarm</i></label>
+      </md-grid-tile>
+      <md-grid-tile>
+          <i class="material-icons">timer</i>
+      </md-grid-tile>
+    </md-grid-list>
+    <md-grid-list cols="2" rowHeight="6.5:1">
+      <md-grid-tile>
+         <md-slide-toggle input id ="checkbox"></md-slide-toggle>
+      </md-grid-tile>
+      <md-grid-tile>
+         <md-slide-toggle input id ="checkbox"></md-slide-toggle>
+      </md-grid-tile>
+    </md-grid-list>
+
+    <md-grid-list cols="5" rowHeight="0.9:1" class="timeSetting">
+      <md-grid-tile [colspan]="1"></md-grid-tile>
+      <md-grid-tile [colspan]="3">
+        <md-input-container>
+          <input mdInput>
+        </md-input-container><span>:</span>
+        <md-input-container>
+          <input mdInput>
+        </md-input-container><span>:</span>
+        <md-input-container>
+          <input mdInput>
+        </md-input-container>
+      </md-grid-tile>
+      <md-grid-tile [colspan]="1"></md-grid-tile>
+    </md-grid-list>
+
+    <md-grid-list cols="1" rowHeight="7:1">
+      <md-grid-tile>
+
+        <md-select placeholder="Select Sound" [(ngModel)]="selectedAudio" name="selectedAudio">
+          <md-option [value]="morning">
+            Morning Alarm
+          </md-option>
+          <md-option [value]="beep">
+            Beeping Sound
+          </md-option>
+          <md-option [value]="youtube">
+            Youtube
+          </md-option>
+        </md-select>
+
+      </md-grid-tile>
+    </md-grid-list>
+
+    <md-grid-list cols="1" rowHeight="5:1">
+      <md-grid-tile>
+        <button md-raised-button>SET</button>
+      </md-grid-tile>
+    </md-grid-list>
+
+
+  </form>
+
+</section>

@@ -1,0 +1,521 @@
+section {
+	background: black;
+  width: 100%;
+  height: 100vh;
+}
+
+.container {
+	padding-top: 30vh;
+	text-align: center;
+}
+#lcd-clock {
+	width: 55%; /* set the width of the clock display */
+	margin: 0 auto;
+}
+
+/* svg specific css */
+.lcd-element {
+  fill: rgba(255,0,0,0.15);
+	transition: all 0.2s ease-out
+}
+.lcd-element-active {
+	fill: red;
+}
+
+
+/*
+all number-is-* classes are applied alongside .digit
+eg <g class="hour digit digit-1 number-is-3">
+*/
+
+/* 1 */
+.number-is-1 .top-right,
+.number-is-1 .bottom-right,
+/* 2 */
+.number-is-2 .top-center,
+.number-is-2 .top-right,
+.number-is-2 .mid-center,
+.number-is-2 .bottom-left,
+.number-is-2 .bottom-center,
+/* 3 */
+.number-is-3 .top-center,
+.number-is-3 .top-right,
+.number-is-3 .mid-center,
+.number-is-3 .bottom-right,
+.number-is-3 .bottom-center,
+/* 4 */
+.number-is-4 .top-left,
+.number-is-4 .top-right,
+.number-is-4 .mid-center,
+.number-is-4 .bottom-right,
+/* 5 */
+.number-is-5 .top-center,
+.number-is-5 .top-left,
+.number-is-5 .mid-center,
+.number-is-5 .bottom-right,
+.number-is-5 .bottom-center,
+/* 6 */
+.number-is-6 .top-center,
+.number-is-6 .top-left,
+.number-is-6 .mid-center,
+.number-is-6 .bottom-right,
+.number-is-6 .bottom-left,
+.number-is-6 .bottom-center,
+/* 7 */
+.number-is-7 .top-center,
+.number-is-7 .top-right,
+.number-is-7 .bottom-right,
+/* 8 */
+.number-is-8 .top-center,
+.number-is-8 .top-left,
+.number-is-8 .top-right,
+.number-is-8 .mid-center,
+.number-is-8 .bottom-right,
+.number-is-8 .bottom-left,
+.number-is-8 .bottom-center,
+/* 9 */
+.number-is-9 .top-center,
+.number-is-9 .top-left,
+.number-is-9 .top-right,
+.number-is-9 .mid-center,
+.number-is-9 .bottom-right,
+.number-is-9 .bottom-center,
+/* 0 */
+.number-is-0 .top-center,
+.number-is-0 .top-left,
+.number-is-0 .top-right,
+.number-is-0 .bottom-right,
+.number-is-0 .bottom-left,
+.number-is-0 .bottom-center
+{
+	fill: red;
+}
+
+@font-face {
+   font-family: digital;
+   src: url(../../../assets/digital-7.regular.ttf);
+}
+
+.pmOrAm{
+  color: red;
+  font-size: 3em;
+  font-family: digital;
+}
+
+.clock a{
+  text-decoration: none;
+}
+
+
+/* Arrow to prompt click */
+.arrowIcon{
+  padding: 5vh 0;
+  width: 100%;
+  text-align: center;
+  color: red;
+  font-size: 60px;
+  font-weight: 100;
+  animation: bounce 5s infinite;
+}
+
+@-webkit-keyframes bounce{
+  from,20%,60%,to{
+    -webkit-animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);
+    animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);
+    -webkit-transform:translate3d(0, 0, 0);
+    transform:translate3d(0, 0, 0)
+    }
+    40%,43%{
+      -webkit-animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);
+      animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);
+      -webkit-transform:translate3d(0, -30px, 0);
+      transform:translate3d(0, -30px, 0)
+      }
+      75%{-webkit-animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);
+        animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);
+        -webkit-transform:translate3d(0, -20px, 0);
+        transform:translate3d(0, -20px, 0)
+        }to{
+          -webkit-transform:translate3d(0, 0, 0);
+          transform:translate3d(0, 0, 0)}
+        }
+
+@keyframes bounce{from,20%,60%,to{-webkit-animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);-webkit-transform:translate3d(0, 0, 0);transform:translate3d(0, 0, 0)}40%,43%{-webkit-animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);-webkit-transform:translate3d(0, -30px, 0);transform:translate3d(0, -30px, 0)}75%{-webkit-animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);animation-timing-function:cubic-bezier(0.215, 0.61, 0.355, 1);-webkit-transform:translate3d(0, -20px, 0);transform:translate3d(0, -20px, 0)}to{-webkit-transform:translate3d(0, 0, 0);transform:translate3d(0, 0, 0)}}
+
+button.introduct{
+  position: absolute;
+  top: 8vh;
+  right: 5vw;
+  color: red;
+}
+.introduct i{
+  font-size: 3.5em;
+}
+
+
+
+
+ /* MEDIA QUERIES */
+
+/* ----------- iPhone 5 and 5S ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2) {
+    .container {
+  		padding-top: 36vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 82%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .pmOrAm{
+      font-size: 1.3em;
+    }
+    .arrowIcon{
+      padding: 6vh 0;
+      font-size: 30px;
+    }
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: landscape) {
+    .container {
+  		padding-top: 30vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 60%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .arrowIcon{
+      padding: 9vh 0;
+      font-size: 30px;
+    }
+    .pmOrAm{
+      font-size: 1.7em;
+    }
+}
+
+/* ----------- iPhone 6 ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 375px)
+  and (max-device-width: 667px)
+  and (-webkit-min-device-pixel-ratio: 2) {
+    .container {
+  		padding-top: 36vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 85%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .pmOrAm{
+      font-size: 1.6em;
+    }
+    .arrowIcon{
+      padding: 6vh 0;
+      font-size: 33px;
+    }
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 375px)
+  and (max-device-width: 667px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 375px)
+  and (max-device-width: 667px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: landscape) {
+    .container {
+  		padding-top: 30vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 60%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .pmOrAm{
+      font-size: 2.1em;
+    }
+    .arrowIcon{
+      padding: 9vh 0;
+      font-size: 33px;
+    }
+}
+
+/* ----------- iPhone 6+ ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 414px)
+  and (max-device-width: 736px)
+  and (-webkit-min-device-pixel-ratio: 3) {
+    .container {
+  		padding-top: 36vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 86%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .pmOrAm{
+      font-size: 1.8em;
+    }
+    .arrowIcon{
+      padding: 6vh 0;
+      font-size: 33px;
+    }
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 414px)
+  and (max-device-width: 736px)
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) {
+
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 414px)
+  and (max-device-width: 736px)
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: landscape) {
+    .container {
+  		padding-top: 30vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 60%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .pmOrAm{
+      font-size: 2.2em;
+    }
+    .arrowIcon{
+      padding: 9vh 0;
+      font-size: 33px;
+    }
+}
+
+/* ----------- iPad mini ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px)
+  and (-webkit-min-device-pixel-ratio: 1) {
+    .container {
+  		padding-top: 36vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 70%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .arrowIcon{
+      padding: 6vh 0;
+      font-size: 40px;
+    }
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px)
+  and (orientation: portrait)
+  and (-webkit-min-device-pixel-ratio: 1) {
+
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px)
+  and (orientation: landscape)
+  and (-webkit-min-device-pixel-ratio: 1) {
+    .container {
+  		padding-top: 30vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 60%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .arrowIcon{
+      padding: 9vh 0;
+      font-size: 40px;
+    }
+}
+
+/* ----------- iPad 1 and 2 ----------- */
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px)
+  and (-webkit-min-device-pixel-ratio: 1) {
+    .container {
+  		padding-top: 36vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 70%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .arrowIcon{
+      padding: 6vh 0;
+      font-size: 50px;
+    }
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px)
+  and (orientation: portrait)
+  and (-webkit-min-device-pixel-ratio: 1) {
+
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px)
+  and (orientation: landscape)
+  and (-webkit-min-device-pixel-ratio: 1) {
+    .container {
+  		padding-top: 30vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 60%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .arrowIcon{
+      padding: 9vh 0;
+      font-size: 50px;
+    }
+}
+
+/* ----------- iPad 3 and 4 ----------- */
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px)
+  and (-webkit-min-device-pixel-ratio: 2) {
+    .container {
+  		padding-top: 36vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 70%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .arrowIcon{
+      padding: 6vh 0;
+      font-size: 50px;
+    }
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px)
+  and (orientation: portrait)
+  and (-webkit-min-device-pixel-ratio: 2) {
+
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px)
+  and (orientation: landscape)
+  and (-webkit-min-device-pixel-ratio: 2) {
+    .container {
+  		padding-top: 30vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 60%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .arrowIcon{
+      padding: 9vh 0;
+      font-size: 50px;
+    }
+}
+
+/* ----------- iPad Pro ----------- */
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 1024px)
+  and (max-device-width: 1366px)
+  and (-webkit-min-device-pixel-ratio: 1.5) {
+    .container {
+  		padding-top: 36vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 65%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .arrowIcon{
+      padding: 6vh 0;
+      font-size: 55px;
+    }
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 1024px)
+  and (max-device-width: 1366px)
+  and (orientation: portrait)
+  and (-webkit-min-device-pixel-ratio: 1.5) {
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 1024px)
+  and (max-device-width: 1366px)
+  and (orientation: landscape)
+  and (-webkit-min-device-pixel-ratio: 1.5) {
+    .container {
+  		padding-top: 30vh;
+  		text-align: center;
+  	}
+  	#lcd-clock {
+  		width: 55%; /* set the width of the clock display */
+  		margin: 0 auto;
+  	}
+    .arrowIcon{
+      padding: 9vh 0;
+      font-size: 55px;
+    }
+}

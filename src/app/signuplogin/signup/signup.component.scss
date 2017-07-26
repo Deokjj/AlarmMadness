@@ -1,0 +1,317 @@
+@import "~assets/colors.scss";
+
+@font-face {
+   font-family: digital;
+   src: url(../../../assets/digital-7.regular.ttf);
+}
+@font-face {
+   font-family: digitalMono;
+   src: url(../../../assets/digital-7.mono.ttf);
+}
+
+section{
+  position: absolute;
+  margin: 0;
+  padding: 0 22%;
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+  z-index: 1;
+
+  md-error{
+    font-size: 0.75em;
+  }
+}
+
+section.signUp{
+
+  .intro{
+    position: relative;
+    width: 100%;
+    height: 50vh;
+    top: 50%;
+    margin-top: -25vh;
+    text-align: center;
+    font-weight: 100;
+    overflow: visible;
+    color: $pink600;
+    // text-shadow: -1px 0 $pink300, 0 1px $pink300, 1px 0 $pink300, 0 -1px $pink300;
+    // text-shadow: 0px 1px 0px white;
+  }
+
+  h1{
+    font-size: 2.4em;
+    font-weight: 100;
+  }
+
+  h2{
+    font-size: 1.9em;
+    font-weight: 100;
+  }
+
+  .cameraTopPadding{
+    margin-top: 12vh;
+  }
+
+  .buttonToCamera{
+    margin-top: 20px;
+    font-size: 1.5em;
+    height: 3em;
+    width: 8em;
+    font-weight: 400;
+  }
+
+  .camera{
+    border-radius: 5%;
+    color: $pink600;
+    text-align: center;
+  }
+
+  snack-bar-container.snackBar{
+    color: white !important;
+    font-size: 2em !important;
+  }
+
+  md-spinner{
+    width: 160px;
+    height: 160px;
+    position: absolute;
+    top:40%;
+    left:50%;
+    // margin-top: -80px;
+    // margin-left: -80px;
+    transform: translate(-50%, -50%);
+  }
+
+  form{
+    position: absolute;
+    width: 40%;
+    margin: 0;
+    position: absolute;
+    top: 58%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 2em;
+  }
+
+  .input-width {
+    width: 100%;
+    color: white;
+    margin-bottom: 25px;
+
+    md-error{
+      font-size: 0.8em;
+    }
+  }
+
+  .signUpBtn{
+    width: 40%;
+    height: 60px;
+    margin: auto;
+    background-color: $pink500;
+    font-size: 1em;
+    position: relative;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .routeToLoginBtn{
+    position: absolute;
+    top: 10%;
+    right: 5%;
+    width: 150px;
+    height: 60px;
+    font-size: 1.5em;
+    color: $pink200;
+    font-weight: 100;
+    transform: translate(-50%,-50%);
+    line-height: 60px;
+    // border-bottom: 1px solid $pink700;
+  }
+  .routeToLoginBtn:after{
+    content: '';
+    display: block;
+    position: absolute;
+    width:80px;
+    bottom:5px;
+    left:33px;
+    border-bottom: 1px solid $pink200;
+  }
+}//SignUp style
+
+
+
+section.login{
+  position: absolute;
+  margin: 0;
+  padding: 0 22%;
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+  z-index: 999;
+  form{
+    position: absolute;
+    width: 40%;
+    margin: 0;
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 2em;
+  }
+
+  .input-width {
+    width: 100%;
+    color: white;
+    margin-bottom: 25px;
+  }
+
+  .logInBtn{
+    width: 40%;
+    height: 60px;
+    margin: auto;
+    background-color: $pink500;
+    font-size: 1em;
+    position: relative;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .routeToSignUpBtn{
+    position: absolute;
+    top: 10%;
+    right: 5%;
+    width: 150px;
+    height: 60px;
+    font-size: 1.5em;
+    color: $pink200;
+    font-weight: 100;
+    transform: translate(-50%,-50%);
+    line-height: 60px;
+    // border-bottom: 1px solid $pink700;
+  }
+
+  .routeToSignUpBtn:after{
+    content: '';
+    display: block;
+    position: absolute;
+    width:85px;
+    bottom:5px;
+    left:33px;
+    border-bottom: 1px solid $pink200;
+  }
+}//Log In view
+
+section.alarmView{
+  padding: 0;
+
+  .side-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 2;
+    background:transparent !important;
+  }
+
+  .sidenav {
+    padding: 20px;
+    button{
+      font-size: 1.1em;
+      font-weight: 400;
+      height: 60px;
+      width: 150px;
+      display: block;
+      text-align: left;
+    }
+    i{
+      font-size: 1.8em;
+    }
+  }
+
+  .sideBar{
+    position: fixed;
+    top:5%;
+    left:3%;
+    color:$pink600;
+    display: flex;
+    i.material-icons{
+      font-size: 3em;
+    }
+    button{
+      color: $pink600;
+    }
+  }
+
+  .currentClock{
+    color: $pink600;
+    font-size: 3em;
+    z-index: 3;
+    font-family: digital;
+    position: absolute;
+    top: 5%;
+    right: 4%;
+    height: 89px;
+    text-align: center;
+    width: 200px;
+    // transform: translate(-50%,-50%);
+    p{
+      margin: 0;
+    }
+    span{
+      font-family: digital;
+    }
+    span.smaller{
+      font-size: 0.5em;
+    }
+  }
+
+
+  .alarmInterface{
+    color: $pink700;
+    position: absolute;
+    z-index: 3;
+    width: 55%;
+    height:80%;
+    margin: 0;
+    top: 52%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    md-grid-tile{
+      // border: 0.5px solid white;
+    }
+    i.material-icons{
+      font-size: 2em;
+    }
+    .timeSetting{
+      font-family: digitalMono;
+      font-size: 3em;
+      line-height: 0.5em;
+      md-input-container{
+        width: 88px;
+        padding: 0;
+      }
+      .mat-input-infix{
+        padding-bottom: 15px !important;
+      }
+      span{
+        font-weight: 900;
+      }
+    }
+    md-select{
+      font-size: 2em;
+    }
+    button{
+      width: 220px;
+      height: 80px;
+      font-size: 1.4em;
+      font-weight: 400;
+      background-color: $pink700;
+      color: white;
+    }
+
+  }
+
+}

@@ -1,0 +1,16 @@
+<section id="cameraWrapper">
+
+  <!-- [ngStyle]="{width:'500px', height:'500px'}" -->
+  <ack-webcam class="webcam" [(ref)]="webcam" [options]="options" (onSuccess)="onCamSuccess($event)" (onError)="onCamError($event)"></ack-webcam>
+
+
+  <div *ngIf="finalPhoto" style="width: 100%; height: 600px" class="photoTaken" [style.background-image]="base64?'url('+base64+')':null"></div>
+
+  <!-- <div class="">
+  <button (click)="visionDetect()"> 64 -> faceDetect </button>
+  <button (click)="genPostData()"> generate post data </button>
+</div> -->
+
+  <!-- <input type="file" (change)="fileEvent($event)"> -->
+
+</section>

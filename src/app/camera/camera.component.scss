@@ -1,0 +1,19 @@
+section{
+  padding: 0;
+  margin: 0;
+
+}
+
+.photoTaken{
+  width: 100%;
+  height: auto;
+  background-size: cover;
+  background-repeat: no-repeat;
+  margin: auto;
+}
+._hidden{
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  display: none;
+}
