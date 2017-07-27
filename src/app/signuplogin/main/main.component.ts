@@ -13,6 +13,7 @@ import { DialogComponent } from './dialog/dialog.component';
 
 export class MainComponent implements OnInit {
   pmOrAm : string = "";
+  updateInterval: any;
 
 
   constructor(public dialog: MdDialog) {
@@ -104,14 +105,18 @@ export class MainComponent implements OnInit {
 
     		clock.toggleDots();
     		clock.updateClock();
-    		// update every half second to make dots flash at that rate :)
-    		setInterval(clock.updateClock, 500);
+    		// // update every half second to make dots flash at that rate :)
+    		// this.updateInterval = setInterval(clock.updateClock, 500);
+        /* FIX THIS FUNCTION SO IT UPDATES AM AND PM WHEN NEEDED */
 
     	}
 
     };
     clock.init();
 
+  }
+  stopIntervalTime(){
+    clearInterval(this.updateInterval);
   }
 
 }

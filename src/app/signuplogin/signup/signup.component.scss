@@ -23,6 +23,17 @@ section{
   }
 }
 
+.cameraTopPadding{
+  margin-top: 10vh;
+}
+
+
+.camera{
+  border-radius: 5%;
+  color: $pink600;
+  text-align: center;
+}
+
 section.signUp{
 
   .intro{
@@ -49,22 +60,12 @@ section.signUp{
     font-weight: 100;
   }
 
-  .cameraTopPadding{
-    margin-top: 12vh;
-  }
-
   .buttonToCamera{
     margin-top: 20px;
     font-size: 1.5em;
     height: 3em;
     width: 8em;
     font-weight: 400;
-  }
-
-  .camera{
-    border-radius: 5%;
-    color: $pink600;
-    text-align: center;
   }
 
   snack-bar-container.snackBar{
@@ -114,6 +115,10 @@ section.signUp{
     position: relative;
     margin-left: 50%;
     transform: translateX(-50%);
+  }
+  .signUpBtn:disabled{
+    background-color:$bluegrey800;
+    color: $bluegrey500;
   }
 
   .routeToLoginBtn{
@@ -177,6 +182,10 @@ section.login{
     position: relative;
     margin-left: 50%;
     transform: translateX(-50%);
+  }
+  .logInBtn:disabled{
+    background-color:$bluegrey800;
+    color: $bluegrey500;
   }
 
   .routeToSignUpBtn{
@@ -272,18 +281,31 @@ section.alarmView{
     color: $pink700;
     position: absolute;
     z-index: 3;
-    width: 55%;
-    height:80%;
+    width: 50%;
+    height:460px;
     margin: 0;
-    top: 52%;
+    // padding: 50px 0;
+    top: 330px;
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 2em;
+    // border: 0.5px solid pink;
+    md-grid-list{
+      background-color: $rgbaBack;
+    }
     md-grid-tile{
       // border: 0.5px solid white;
     }
     i.material-icons{
       font-size: 2em;
+      color: $bluegrey700;
+      cursor: pointer;
+    }
+    .pinkIt{
+      color: $pink700 !important;
+    }
+    md-slide-toggle{
+
     }
     .timeSetting{
       font-family: digitalMono;
@@ -299,19 +321,92 @@ section.alarmView{
       span{
         font-weight: 900;
       }
+      input#amOrPmInput{
+        // display: none;
+      }
+      .amBtn{
+        font-size: 35px;
+        cursor: pointer;
+      }
+      .shiftALittle{
+        margin-right: -31.83px;
+      }
     }
     md-select{
       font-size: 2em;
     }
     button{
-      width: 220px;
+      width: 350px;
       height: 80px;
       font-size: 1.4em;
       font-weight: 400;
       background-color: $pink700;
       color: white;
     }
+    button:disabled{
+      background-color:$bluegrey800;
+      color: $bluegrey500;
+    }
 
+  }//alarmInterface
+
+  .ring-container{
+    position:absolute;
+    top:46%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    z-index: 5;
+
+    .msgChip{
+      width:200px;
+      height: 30px;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 25px;
+      line-height: 30px;
+      font-weight: 100;
+      color: $pink400;
+      background-color: $bluegrey700;
+    }
+  }
+  svg.ringingAlarm{
+    margin: 0 64px;
+  }
+
+  #minute{
+    transform-origin:left top;
+  }
+  svg.ringingAlarm{
+        -webkit-animation:0.5s linear infinite;
+        animation: wiggle 0.5s linear infinite;
+      #minute{
+        -webkit-animation: rotate 1s linear infinite;
+        animation: rotate 1s linear infinite;
+      }
+      #hour, #minute, #clockface{
+        stroke:$pink700 !important;
+      }
+      #bell1, #bell2, #clockcentre{
+        fill:$pink700;
+      }
+  }
+
+  @keyframes wiggle{
+    10%, 30%,50%, 70%, 90% {
+      transform: rotate(-10deg)};
+    0%, 20%, 40%, 60%, 80% {
+      transform: rotate(10deg)};
+  }
+
+  @keyframes rotate{
+    from{
+      -ms-transform:rotate(0deg);
+      transform:rotate(0deg);
+    };
+    to{
+      -ms-transform:rotate(360deg);
+      transform:rotate(360deg);
+    };
   }
 
 }

@@ -1,16 +1,21 @@
 import * as jQuery from 'jquery';
+import * as moment from 'moment';
+// import * as fs from 'fs';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CameraComponent } from '../../camera/camera.component';
 import { BackgroundComponent } from '../../background/background.component';
-import { MdSnackBar } from '@angular/material';
+import { MdSnackBar, MdSidenavContainer } from '@angular/material';
 import { MsgSnackComponent } from './msg-snack/msg-snack.component';
 import { FormControl, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
+import { FileUploader } from 'ng2-file-upload';
+// import { AwsService } from '../../services/aws.service';
 
 // import { SnackServiceService } from './msg-snack/snack-service.service';
 
 const NAME_REGEX = /^([ \u00c0-\u01ffa-zA-Z'\-])+$/;
+const NUMBERONLY = /^\d+$/;
 
 @Component({
   selector: 'app-signup',
@@ -20,6 +25,8 @@ const NAME_REGEX = /^([ \u00c0-\u01ffa-zA-Z'\-])+$/;
 export class SignupComponent implements OnInit {
   @ViewChild(CameraComponent) cameraComponent: CameraComponent;
   @ViewChild(BackgroundComponent) background : BackgroundComponent;
+  @ViewChild(MdSidenavContainer) navContainer: MdSidenavContainer;
+
   // input initializing
   nameInput: string;
   passwordInput : string;
@@ -30,6 +37,8 @@ export class SignupComponent implements OnInit {
   loggedIn: boolean = false;
   toSignInBoolean: boolean = true;
   toAlarmBoolean: boolean = true;
+  toFeedBoolean: boolean = false;
+  ringingViewBoolean: boolean =false;
   //
 
   launched:boolean = false; //Ready btn Clicked
@@ -45,10 +54,25 @@ export class SignupComponent implements OnInit {
 
   progress: boolean = true; // Nothing to do with logic. progress bar for user
 
+  uploader = new FileUploader({
+    url: 'http://localhost:3000/api/signup'
+  });
   // testBoolean: boolean = true;
 
-  now: number = Date.now();
-  selectedAudio: string = '';
+  // now: number = Date.now();
+  now: number;
+
+  //Alarm Form
+  isAlarmChecked: boolean = true; // true if alarm false if timer
+  selectedAudio: string = ''; // morning, beeping, youtube
+  isPM: boolean = false; // true if PM false if AM
+  hoursInput: number;
+  minsInput: number;
+  secsInput: number;
+
+  alarm: any = {};
+  hasAlarm: boolean = false;
+  set: any;
 
 
   nameFormControl = new FormControl('', [
@@ -63,13 +87,44 @@ export class SignupComponent implements OnInit {
     Validators.maxLength(20)
   ]);
 
+  sounds = [
+    {value: 'morning', viewValue: 'Morning Alarm'},
+    {value: 'beeping', viewValue: 'Beeping Sound'},
+    {value: 'youtube', viewValue: 'Youtube'}
+  ];
+
+
+    hoursFormControl = new FormControl('', [
+      Validators.required,
+      Validators.pattern(NUMBERONLY),
+      Validators.min(1),
+      Validators.max(12)
+    ]);
+    minsFormControl = new FormControl('', [
+      Validators.required,
+      Validators.pattern(NUMBERONLY),
+      Validators.min(0),
+      Validators.max(60)
+    ]);
+    secsFormControl = new FormControl('', [
+      Validators.required,
+      Validators.pattern(NUMBERONLY),
+      Validators.min(0),
+      Validators.max(60)
+    ]);
+
   constructor(
     public snackBar: MdSnackBar,
     private userService: UserService,
+    // private awsService: AwsService,
     private router: Router) {
     if(!this.currentUser){
       console.log("yes");
     }
+    this.now = Date.now();
+    setInterval(()=>{
+      this.now = Date.now();
+    },500)
   }
 
   ngOnInit() {
@@ -78,10 +133,6 @@ export class SignupComponent implements OnInit {
       this.currentUser = currentUserFromApi;
       this.loggedIn=true;
     } )
-
-    setInterval(()=>{
-      this.now = Date.now();
-    },500)
   }
 
   ngDoCheck() {
@@ -194,7 +245,21 @@ export class SignupComponent implements OnInit {
       });
     }
 
+    if(this.loggedIn && this.toAlarmBoolean &&
+      !($('.mat-input-infix').css('padding') === "15px 0px") ){
+      $('.mat-input-infix').css('padding','15px 0');
+      $('.mat-disabled').removeClass('mat-disabled');
+    }
 
+    if(this.hasAlarm){
+      if(this.set.isSameOrBefore(this.now)){
+        this.set = undefined;
+        this.alarm = {};
+        this.hasAlarm = false;
+        this.background.switchBackground();
+        this.ringingViewBoolean = true;
+      }
+    }
   }//end of ngDoCheck
 
 
@@ -249,7 +314,24 @@ export class SignupComponent implements OnInit {
   }
 
   signUp(){
-    this.userService.signup(this.nameInput, this.passwordInput)
+
+    // this.imgUpload.onSuccessItem = (item, response) => {
+    //   return;
+    // }
+    // this.imgUpload.onErrorItem = (item, response) => {
+    //   this.message = "Oops something went wrong :(";
+    //   return;
+    // }
+    // this.imgUpload.onBuildItemForm = (item, formToBeSent) => {
+    //   for (let fieldName in form.value) {
+    //     formToBeSent.append(fieldName, form.value[fieldName]);
+    //   }
+    //
+    // }
+
+    // this.imgUpload.uploadAll();
+
+    this.userService.signup(this.nameInput, this.passwordInput, undefined)
     .then((resultFromApi) => {
         // clear form
         this.nameInput = "";
@@ -298,6 +380,57 @@ export class SignupComponent implements OnInit {
 
   /********** sign up & log in done **********/
 
+  sidenavOpen(){
+    // console.log('yeees');
+    this.navContainer.open();
+    $('.side-container').click(()=>{
+      // console.log('hey!!');
+    })
+  }
+
+  viewAlarm(){
+    this.toFeedBoolean = false;
+    this.toAlarmBoolean = true;
+    this.navContainer.close();
+  }
+  viewFeed(){
+    this.toFeedBoolean = true;
+    this.toAlarmBoolean = false;
+    this.navContainer.close();
+  }
+
+  isAlarmCheckedToggle(){
+    this.isAlarmChecked = this.isAlarmChecked ? false : true;
+    this.isAlarmChecked ?
+      $('.alarmIcon').addClass('pinkIt'): $('.alarmIcon').removeClass('pinkIt');
+    this.isAlarmChecked ?
+      $('.timerIcon').removeClass('pinkIt'): $('.timerIcon').addClass('pinkIt');
+    $('.mat-disabled').removeClass('mat-disabled');
+  }
+
+  amPmToggle(){
+    this.isPM = this.isPM ? false : true;
+    this.isPM ? $('.amBtn').html('PM') : $('.amBtn').html('AM');
+  }
+
+  createAlarm(){
+    let amPmString = this.isPM ? "PM" : "AM";
+    let timeString = `${this.hoursInput}:${this.minsInput}:${this.secsInput} ${amPmString}`;
+
+    let alarmSet = moment(timeString, ["h:mm:ss A"]);
+    if( alarmSet.isSameOrBefore(moment()) ){
+      alarmSet.add(1,'days');
+    } //the alarm Time set.
+    console.log(alarmSet);
+    console.log(this.selectedAudio);
+    this.alarm = {
+      createdAt : new Date(),
+      set: alarmSet.toDate(),
+      selectedAudio: this.selectedAudio
+    }
+    this.hasAlarm = true;
+    this.set = alarmSet;
+  }
 
 
 

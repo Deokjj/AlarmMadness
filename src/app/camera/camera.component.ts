@@ -63,7 +63,8 @@ export class CameraComponent implements OnInit {
   //get HTML5 FormData object and pretend to post to server
   genPostData(){
     this.webcam.captureAsFormData({fileName:'file.jpg'})
-    .then( formData=>this.postFormData(formData) )
+    // .then( formData=>this.postFormData(formData) )
+    .then( formData => console.log("data from webcam capture", formData))
     .catch( e=>console.error(e) )
     // this.genBase64();
   }
@@ -87,7 +88,7 @@ export class CameraComponent implements OnInit {
 
   onCamError(err){}
 
-  onCamSuccess(){
+  onCamSuccess(whatever){
     this.webcam.options = {
       audio: false,
       video: true,

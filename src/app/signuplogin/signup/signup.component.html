@@ -122,15 +122,15 @@
 
 
 
-<section *ngIf="loggedIn && toAlarmBoolean" class="alarmView">
+<section *ngIf="loggedIn" class="alarmView">
 
-  <md-sidenav-container class="side-container">
+  <md-sidenav-container class="side-container" *ngIf="!ringingViewBoolean">
     <md-sidenav #sidenav class="sidenav">
-      <button md-button>&nbsp;
+      <button md-button (click)="viewAlarm()">&nbsp;
         <i class="material-icons">alarm</i>
         <span>Alarm</span>
       </button>
-      <button md-button>&nbsp;
+      <button md-button (click)="viewFeed()">&nbsp;
         <i class="material-icons">face</i>
         Feed
       </button>
@@ -142,7 +142,7 @@
     </md-sidenav>
 
     <div class="sideBar">
-      <button type="button" md-button (click)="sidenav.open()">
+      <button type="button" md-button (click)="sidenavOpen()">
         <i class="material-icons">menu</i>
       </button>
     </div>
@@ -155,65 +155,99 @@
 
   </div>
 
-  <form class="alarmInterface">
-    <md-grid-list cols="2" rowHeight="4.5:1">
+  <form class="alarmInterface" (ngSubmit)="createAlarm()" *ngIf="toAlarmBoolean && !ringingViewBoolean">
+    <md-grid-list cols="2" rowHeight="3:1" style="padding-top: 40px; border-radius:10px 10px 0 0">
+
       <md-grid-tile>
-          <label for="checkbox" class="iconsLabel"><i class="material-icons">alarm</i></label>
+        <span mdTooltip="Alarm" mdTooltipPosition="above">
+          <label for="alarmCheck" (click)="isAlarmCheckedToggle()">
+              <i class="material-icons alarmIcon pinkIt">alarm</i>
+          </label>
+        </span>
       </md-grid-tile>
       <md-grid-tile>
-          <i class="material-icons">timer</i>
+        <span mdTooltip="Timer" mdTooltipPosition="above">
+          <label for="timerCheck" (click)="isAlarmCheckedToggle()">
+              <i class="material-icons timerIcon">timer</i>
+          </label>
+        </span>
       </md-grid-tile>
+
     </md-grid-list>
-    <md-grid-list cols="2" rowHeight="6.5:1">
+    <md-grid-list cols="2" rowHeight="5:1">
       <md-grid-tile>
-         <md-slide-toggle input id ="checkbox"></md-slide-toggle>
+         <md-slide-toggle input id ="alarmCheck" [checked]="isAlarmChecked"
+          (click)="isAlarmCheckedToggle()" disabled></md-slide-toggle>
       </md-grid-tile>
       <md-grid-tile>
-         <md-slide-toggle input id ="checkbox"></md-slide-toggle>
+         <md-slide-toggle input id ="timerCheck" [checked]="!isAlarmChecked"
+          (click)="isAlarmCheckedToggle()" disabled></md-slide-toggle>
       </md-grid-tile>
     </md-grid-list>
 
-    <md-grid-list cols="5" rowHeight="0.9:1" class="timeSetting">
+    <md-grid-list cols="10" rowHeight="0.5:1" class="timeSetting">
       <md-grid-tile [colspan]="1"></md-grid-tile>
-      <md-grid-tile [colspan]="3">
+      <md-grid-tile [colspan]="8">
         <md-input-container>
-          <input mdInput>
+          <input mdInput [formControl]="hoursFormControl"
+           [(ngModel)]="hoursInput" name="hoursInput" >
         </md-input-container><span>:</span>
         <md-input-container>
-          <input mdInput>
+          <input mdInput [formControl]="minsFormControl"
+           [(ngModel)]="minsInput" name="minsInput">
         </md-input-container><span>:</span>
         <md-input-container>
-          <input mdInput>
+          <input mdInput [formControl]="secsFormControl"
+           [(ngModel)]="secsInput" name="secsInput">
         </md-input-container>
+        <label class="amBtn shiftALittle" (click)="amPmToggle()" *ngIf="isAlarmChecked">AM</label>
       </md-grid-tile>
       <md-grid-tile [colspan]="1"></md-grid-tile>
     </md-grid-list>
 
-    <md-grid-list cols="1" rowHeight="7:1">
+    <md-grid-list cols="1" rowHeight="9:1">
       <md-grid-tile>
 
-        <md-select placeholder="Select Sound" [(ngModel)]="selectedAudio" name="selectedAudio">
-          <md-option [value]="morning">
-            Morning Alarm
-          </md-option>
-          <md-option [value]="beep">
-            Beeping Sound
-          </md-option>
-          <md-option [value]="youtube">
-            Youtube
+        <md-select placeholder="Sound" [(ngModel)]="selectedAudio" name="selectedAudio">
+          <md-option *ngFor="let sound of sounds" [value]="sound.value">
+            {{ sound.viewValue }}
           </md-option>
         </md-select>
 
       </md-grid-tile>
     </md-grid-list>
 
-    <md-grid-list cols="1" rowHeight="5:1">
+    <md-grid-list cols="1" rowHeight="4:1" style="border-radius:0 0 10px 10px">
       <md-grid-tile>
-        <button md-raised-button>SET</button>
+        <button md-raised-button
+        [disabled]="hoursFormControl.errors || minsFormControl.errors ||
+        secsFormControl.errors || !selectedAudio">
+          <span
+          [mdTooltip]="(hoursFormControl.errors || minsFormControl.errors ||
+          secsFormControl.errors || !selectedAudio) ?
+          'Complete the alarm form!' : null">
+            SET
+          </span>
+        </button>
       </md-grid-tile>
     </md-grid-list>
 
-
   </form>
+
+  <div class="ring-container" *ngIf="ringingViewBoolean">
+    <md-chip-list>
+      <md-chip class="msgChip">Click to Unlock</md-chip>
+    </md-chip-list>
+   <div class="ring-icon">
+    <svg class="ringingAlarm" fill="#000000" height="96" width="96" viewbox="0 0 96 96">
+      <circle id="clockface" cx="48" cy="48" stroke="black" r="30" stroke-width="8" fill="none"/>
+      <circle id="clockcentre" cx="48" cy="48" fill="black" r="4" />
+      <rect id="bell1" x="10" y="10" width="26" height="8" style="-ms-transform: rotate(-40deg); transform: rotate(-40deg); transform-origin: center;"/>
+      <rect id="bell2" x="60" y="10" width="26" height="8" style="-ms-transform: rotate(40deg); transform: rotate(40deg); transform-origin: center"/>
+      <line id="hour" x1="48" y1="50" x2="48" y2="28" style="stroke-width:4px; stroke: black; fill:none;"/>
+      <line id="minute" x1="46" y1="50" x2="64" y2="60" style="stroke-width:4px; stroke: black; fill:none;"/>
+    </svg>
+   </div>
+  </div>
 
 </section>

@@ -13,7 +13,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MdButtonModule, MdCardModule, MdMenuModule, MdToolbarModule,
          MdIconModule, MdDialogModule, MdSnackBarModule, MdProgressSpinnerModule,
          MdInputModule, MdTooltipModule, MdSidenavModule, MdGridListModule,
-         MdSlideToggleModule, MdSelectModule} from '@angular/material';
+         MdSlideToggleModule, MdSelectModule, MdChipsModule } from '@angular/material';
 import { FormsModule, ReactiveFormsModule, FormArray, FormBuilder, FormGroup,
          Validators } from '@angular/forms';
 
@@ -24,11 +24,12 @@ import { WebCamComponent } from 'ack-angular-webcam';
 import { CameraComponent } from './camera/camera.component';
 import { BackgroundComponent } from './background/background.component';
 import { MsgSnackComponent } from './signuplogin/signup/msg-snack/msg-snack.component';
-// import { LoginComponent } from './signuplogin/login/login.component';
-// import { HomeComponent } from './main/home/home.component';
+import { LoginComponent } from './signuplogin/login/login.component';
+import { HomeComponent } from './main/home/home.component';
 
 import { FaceService } from './services/face.service';
 import { UserService } from './services/user.service';
+// import { AwsService } from './services/aws.service';
 
 @NgModule({
   declarations: [
@@ -40,8 +41,8 @@ import { UserService } from './services/user.service';
     CameraComponent,
     BackgroundComponent,
     MsgSnackComponent,
-    // LoginComponent,
-    // HomeComponent
+    LoginComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
@@ -63,10 +64,13 @@ import { UserService } from './services/user.service';
     MdSidenavModule,
     MdGridListModule,
     MdSlideToggleModule,
-    MdSelectModule
+    MdSelectModule,
+    MdChipsModule
   ],
   providers: [FaceService,
-              UserService],
+              UserService,
+              // AwsService
+            ],
   bootstrap: [AppComponent],
   entryComponents: [DialogComponent,
                     MsgSnackComponent]
