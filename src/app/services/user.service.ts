@@ -16,6 +16,7 @@ export class UserService {
       return this.http
         .post(
           'http://localhost:3000/api/signup',
+          // 'https://alarmmadness.herokuapp.com/api/signup',
 
           // Form body information to send to the back end (req.body)
           {
@@ -40,6 +41,7 @@ export class UserService {
       return this.http
         .post(
           'http://localhost:3000/api/login',
+          // 'https://alarmmadness.herokuapp.com/api/login',
 
           // Form body information to send to the back end (req.body)
           {
@@ -63,6 +65,7 @@ export class UserService {
       return this.http
         .post(
           'http://localhost:3000/api/logout',
+          // 'https://alarmmadness.herokuapp.com/api/logout',
 
           // Nothing to send to the back end (req.body)
           {},
@@ -83,6 +86,7 @@ export class UserService {
       return this.http
         .get(
           'http://localhost:3000/api/checklogin',
+          // 'https://alarmmadness.herokuapp.com/api/checklogin',
 
           // Send the cookies across domains
           { withCredentials: true }
@@ -94,5 +98,22 @@ export class UserService {
         // Parse the JSON
         .then(res => res.json());
   } // close checklogin()
+
+  newAlarm(id,timeSet, alarmCreatedAt, soundSet){
+    return this.http
+     .patch(
+       'http://localhost:3000/api/newalarm',
+      //  'https://alarmmadness.herokuapp.com/api/newalarm',
+       {
+         id: id,
+         timeSet: timeSet,
+         alarmCreatedAt: alarmCreatedAt,
+         soundSet: soundSet
+       },
+       { withCredentials: true }
+     )
+     .toPromise()
+     .then(res => res.json());
+  }
 
 }

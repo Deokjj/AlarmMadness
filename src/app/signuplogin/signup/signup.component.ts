@@ -20,7 +20,8 @@ const NUMBERONLY = /^\d+$/;
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.scss']
+  styleUrls: ['./signup.component.scss',
+              './addIt.scss']
 })
 export class SignupComponent implements OnInit {
   @ViewChild(CameraComponent) cameraComponent: CameraComponent;
@@ -73,6 +74,7 @@ export class SignupComponent implements OnInit {
   alarm: any = {};
   hasAlarm: boolean = false;
   set: any;
+  alarmTimeToDisplay =[];
 
 
   nameFormControl = new FormControl('', [
@@ -119,7 +121,7 @@ export class SignupComponent implements OnInit {
     // private awsService: AwsService,
     private router: Router) {
     if(!this.currentUser){
-      console.log("yes");
+      console.log("no User");
     }
     this.now = Date.now();
     setInterval(()=>{
@@ -133,6 +135,19 @@ export class SignupComponent implements OnInit {
       this.currentUser = currentUserFromApi;
       this.loggedIn=true;
     } )
+    .then(()=>{
+      if(this.currentUser.currentAlarm){
+        let soonestAlarm = moment().add(1,'days');//compare with a day ahead right now
+        this.currentUser.currentAlarm.forEach((eachAlarm)=>{
+          if(eachAlarm.timeSet.isSameOrBefore(soonestAlarm)){
+            soonestAlarm = eachAlarm.timeSet;
+          }
+        })
+        this.set = soonestAlarm;
+      }
+      this.refreshUserObject()
+    });
+
   }
 
   ngDoCheck() {
@@ -414,6 +429,9 @@ export class SignupComponent implements OnInit {
   }
 
   createAlarm(){
+
+    this.hasAlarm = true; // Has alarm for sure if just created
+    //validate Am or PM and convert to 24 hour system
     let amPmString = this.isPM ? "PM" : "AM";
     let timeString = `${this.hoursInput}:${this.minsInput}:${this.secsInput} ${amPmString}`;
 
@@ -421,15 +439,30 @@ export class SignupComponent implements OnInit {
     if( alarmSet.isSameOrBefore(moment()) ){
       alarmSet.add(1,'days');
     } //the alarm Time set.
-    console.log(alarmSet);
-    console.log(this.selectedAudio);
-    this.alarm = {
-      createdAt : new Date(),
-      set: alarmSet.toDate(),
-      selectedAudio: this.selectedAudio
+
+    if(!this.set){
+      this.set = alarmSet; //if no previous alarm is set then declare
     }
-    this.hasAlarm = true;
-    this.set = alarmSet;
+    else{ //find the soonest one.
+      this.currentUser.currentAlarm.forEach((eachAlarmFromApi)=>{
+        if(alarmSet.isSameOrBefore(eachAlarmFromApi)){
+          this.set = alarmSet;
+        }
+      })
+    }
+
+    console.log(this.set.toString());
+
+    this.userService.newAlarm
+    (this.currentUser._id,alarmSet.toString(),moment().toString(),this.selectedAudio);
+    setTimeout(()=>{this.refreshUserObject()}, 100);
+  }
+
+  refreshUserObject(){
+    this.userService.checklogin()
+    .then((currentUserFromApi) => {
+      this.currentUser = currentUserFromApi;
+    } )
   }
 
 

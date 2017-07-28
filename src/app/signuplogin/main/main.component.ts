@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MdDialog } from '@angular/material';
 import { DialogComponent } from './dialog/dialog.component';
+import { UserService } from '../../services/user.service';
+import { Router } from '@angular/router';
 // import './clock.js';
 
 @Component({
@@ -14,9 +16,12 @@ import { DialogComponent } from './dialog/dialog.component';
 export class MainComponent implements OnInit {
   pmOrAm : string = "";
   updateInterval: any;
+  currentUser: any = {};
 
 
-  constructor(public dialog: MdDialog) {
+  constructor(public dialog: MdDialog,
+              private userService: UserService,
+              private router: Router) {
     setInterval(() => {
       var time = new Date();
       var hours = time.getHours();
@@ -24,11 +29,23 @@ export class MainComponent implements OnInit {
     },1000);
   }
 
+  stopIntervalTime(){
+    console.log(this.updateInterval);
+    clearInterval(this.updateInterval);
+    console.log('hey!');
+    this.router.navigate(['/home']);
+  }
+
   openDialog() {
     this.dialog.open(DialogComponent);
   }
 
   ngOnInit() {
+    this.userService.checklogin()
+    .then((currentUserFromApi) => {
+      this.router.navigate(['/home']);
+    } )
+
     var clock = {
 
     	clocktime: {
@@ -106,17 +123,15 @@ export class MainComponent implements OnInit {
     		clock.toggleDots();
     		clock.updateClock();
     		// // update every half second to make dots flash at that rate :)
-    		// this.updateInterval = setInterval(clock.updateClock, 500);
-        /* FIX THIS FUNCTION SO IT UPDATES AM AND PM WHEN NEEDED */
 
     	}
 
     };
     clock.init();
+    this.updateInterval = setInterval(clock.updateClock, 500);
+    /* FIX THIS FUNCTION SO IT UPDATES AM AND PM WHEN NEEDED */
+    console.log(this.updateInterval);
 
-  }
-  stopIntervalTime(){
-    clearInterval(this.updateInterval);
   }
 
 }
