@@ -43,6 +43,8 @@ export class SignupComponent implements OnInit {
   //
 
   launched:boolean = false; //Ready btn Clicked
+  cameraOn : boolean = false;
+  isDetectionDone: boolean  =false;
   cameraTurnedOnFromChild: boolean = false; //Camera turned on(allowed)
   firstDetected: boolean = false; //first detection
   faceCompleted: boolean = false; //oneFace found
@@ -92,7 +94,7 @@ export class SignupComponent implements OnInit {
   sounds = [
     {value: 'morning', viewValue: 'Morning Alarm'},
     {value: 'beeping', viewValue: 'Beeping Sound'},
-    {value: 'youtube', viewValue: 'Youtube'}
+    {value: 'youtube', viewValue: 'Freakum'}
   ];
 
 
@@ -115,6 +117,9 @@ export class SignupComponent implements OnInit {
       Validators.max(60)
     ]);
 
+    player: YT.Player;
+    ytId: string = '-HXySf-Fa3U';
+
   constructor(
     public snackBar: MdSnackBar,
     private userService: UserService,
@@ -134,18 +139,14 @@ export class SignupComponent implements OnInit {
     .then((currentUserFromApi) => {
       this.currentUser = currentUserFromApi;
       this.loggedIn=true;
-    } )
-    .then(()=>{
-      if(this.currentUser.currentAlarm){
-        let soonestAlarm = moment().add(1,'days');//compare with a day ahead right now
-        this.currentUser.currentAlarm.forEach((eachAlarm)=>{
-          if(eachAlarm.timeSet.isSameOrBefore(soonestAlarm)){
-            soonestAlarm = eachAlarm.timeSet;
-          }
-        })
-        this.set = soonestAlarm;
-      }
-      this.refreshUserObject()
+    })
+
+    this.refreshAlarm()
+    .then((res)=>{
+      console.log('page refreshed.');
+      console.log('alarmTimeToDisplay: ', this.alarmTimeToDisplay);
+      console.log('hasAlarm: ', this.hasAlarm);
+      console.log('this.set: ', this.set);
     });
 
   }
@@ -166,13 +167,14 @@ export class SignupComponent implements OnInit {
         $('.firstLine').html('Camera ready. Looking for your face...');
       },1400);
       setTimeout(()=>{
-          this.cameraComponent.visionDetect().then(res=>this.firstDetected = true);
-      },4200);
+          this.cameraComponent.visionDetect().then(res=>this.firstDetected = true).then(res => this.isDetectionDone = true);
+      },4000);
     } //First visionDetect done
 
-    if(this.firstDetected && !this.faceCompleted && this.cameraComponent.detected ){
+    if(this.firstDetected && !this.faceCompleted && this.cameraComponent.detected && this.isDetectionDone ){
       console.log("condition running..");
       let continueIt = true;
+      this.isDetectionDone = false;
 
       if(!this.cameraComponent.faceAnno){
         $('.firstLine').html(`I can't find any faces. Show your face.`);
@@ -268,31 +270,30 @@ export class SignupComponent implements OnInit {
 
     if(this.hasAlarm){
       if(this.set.isSameOrBefore(this.now)){
-        this.set = undefined;
-        this.alarm = {};
-        this.hasAlarm = false;
-        this.background.switchBackground();
-        this.ringingViewBoolean = true;
+        this.ringIt();
       }
     }
+
+
   }//end of ngDoCheck
 
 
 
   continueDetecting(){
     return setTimeout(()=>{
-      this.cameraComponent.visionDetect();
-    }, 4000);
+      this.cameraComponent.visionDetect().then(()=>{
+        this.isDetectionDone = true;
+      });
+    }, 3000);
   }
 
   readyClick(){
     this.launched = true;
+    this.cameraOn = true;
   }
 
   showMesseges(){
-    // this.snackBar.open(message ,done? "okay": null ,{
-    //   extraClasses: ['snackBar'] //Why Dosn't this work
-    // });
+
     this.snackBar.openFromComponent(MsgSnackComponent, {
       extraClasses: ['snackBar']// $('.snackBar').css('background-color','#26323');
     });
@@ -355,6 +356,7 @@ export class SignupComponent implements OnInit {
 
         // this.router.navigate(['/home']);
         this.loggedIn = true; // to view logged in views
+        this.currentUser = resultFromApi;
         this.cameraComponent.hideCapture(); // to hide captured img
     })
     .catch((err) => {
@@ -372,10 +374,14 @@ export class SignupComponent implements OnInit {
 
           // clear the error message
           this.errorMsg = "";
-
-          // redirect to /camels
-          // this.router.navigate(['/home']);
           this.loggedIn = true;
+
+          this.refreshAlarm()
+          .then((res)=>{
+            console.log('just logged In, alarm array of current user is: ', this.alarmTimeToDisplay);
+            console.log('hasAlarm: ', this.hasAlarm);
+            console.log('soonest Alarm: ', this.set);
+          });
       })
       .catch((err) => {
           const parsedError = err.json();
@@ -429,10 +435,9 @@ export class SignupComponent implements OnInit {
   }
 
   createAlarm(){
-
-    this.hasAlarm = true; // Has alarm for sure if just created
     //validate Am or PM and convert to 24 hour system
     let amPmString = this.isPM ? "PM" : "AM";
+    // let hourInput = this.hoursInput
     let timeString = `${this.hoursInput}:${this.minsInput}:${this.secsInput} ${amPmString}`;
 
     let alarmSet = moment(timeString, ["h:mm:ss A"]);
@@ -440,31 +445,116 @@ export class SignupComponent implements OnInit {
       alarmSet.add(1,'days');
     } //the alarm Time set.
 
-    if(!this.set){
-      this.set = alarmSet; //if no previous alarm is set then declare
-    }
-    else{ //find the soonest one.
-      this.currentUser.currentAlarm.forEach((eachAlarmFromApi)=>{
-        if(alarmSet.isSameOrBefore(eachAlarmFromApi)){
-          this.set = alarmSet;
-        }
-      })
-    }
-
-    console.log(this.set.toString());
-
     this.userService.newAlarm
-    (this.currentUser._id,alarmSet.toString(),moment().toString(),this.selectedAudio);
-    setTimeout(()=>{this.refreshUserObject()}, 100);
+    (this.currentUser._id,alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ'),moment().toString(),this.selectedAudio)
+    .then((res)=>{
+        this.refreshAlarm()
+        .then((res)=>{
+          console.log("newAlarm set is :", alarmSet);
+          console.log("hasAlarm: ", this.hasAlarm);
+          console.log("soonest set is: ", this.set);
+        });
+    });
+    this.hoursInput = undefined;
+    this.minsInput = undefined;
+    this.secsInput = undefined;
+    this.selectedAudio = undefined;
   }
 
-  refreshUserObject(){
-    this.userService.checklogin()
+  insertionSort(items) {
+    //compare items.timeSet
+
+    var len     = items.length,  // number of items in the array
+        value,                   // the value currently being compared
+        i,                       // index into unsorted section
+        j;                       // index into sorted section
+
+    for (i=0; i < len; i++) {
+
+        // store the current value because it may shift later
+        value = items[i];
+
+        /*
+         * Whenever the value in the sorted section is greater than the value
+         * in the unsorted section, shift all items in the sorted section over
+         * by one. This creates space in which to insert the value.
+         */
+        for (j=i-1; j > -1 && moment(items[j].timeSet).isAfter(value.timeSet); j--) {
+            items[j+1] = items[j];
+        }
+
+        items[j+1] = value;
+    }
+
+    return items;
+}
+
+  refreshAlarm(){
+    return this.userService.checklogin()
     .then((currentUserFromApi) => {
       this.currentUser = currentUserFromApi;
-    } )
+      this.alarmTimeToDisplay = currentUserFromApi.currentAlarm;
+    })
+    .then((res)=>{
+      if(this.alarmTimeToDisplay[0]){
+        this.alarmTimeToDisplay = this.insertionSort(this.alarmTimeToDisplay);
+      }
+    })///This working !! uncomment it
+    .then((res)=>{
+      if(this.alarmTimeToDisplay[0]){
+        this.set = moment(this.alarmTimeToDisplay[0].timeSet);
+        this.hasAlarm = true;
+      }
+    });
   }
 
+
+  savePlayer (player) {
+    this.player = player;
+    console.log('player instance', player)
+  }
+  onStateChange(event){
+    console.log('player state', event.data);
+  }
+
+  playVideo() {
+    this.player.playVideo();
+  }
+
+  pauseVideo() {
+    this.player.pauseVideo();
+  }
+
+  ringIt(){
+    this.set = undefined;
+    this.alarm = {};
+    this.hasAlarm = false;
+    this.background.switchBackground();
+    this.ringingViewBoolean = true;
+    $('.ytp-icon-large-play-button-hover').remove();
+    setTimeout(()=>{this.playVideo()},1500);
+  }
+  unlocking: boolean = false;
+  unlockdetectStarted: boolean = true;
+  continueTimer: any;
+  continueBoolean: boolean = false
+
+  proceedToUnlock(){
+    this.unlocking = true;
+    console.log('clicked');
+    this.showMesseges();
+    this.cameraComponent.reopenCamera();
+    this.launched = true
+    $('.firstLine').html("Open your eyes and mouth wide 😲");
+    // setTimeout(()=>{
+    //   this.cameraComponent.visionDetect()
+    //   .then( res => {
+    //     this.unlockdetectStarted = true;
+    //
+    //   })
+    // },3000);
+
+  }
 
 
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component} from '@angular/core';
 import { Http, Request } from '@angular/http';
 import { FaceService } from '../services/face.service';
 import 'aws-sdk/dist/aws-sdk';
@@ -9,7 +9,7 @@ import 'aws-sdk/dist/aws-sdk';
   templateUrl: './camera.component.html',
   styleUrls: ['./camera.component.scss']
 })
-export class CameraComponent implements OnInit {
+export class CameraComponent{
 
   public webcam//will be populated by ack-webcam [(ref)]
   public base64
@@ -22,6 +22,7 @@ export class CameraComponent implements OnInit {
   detected: boolean = false;
 
   finalPhoto: boolean = false;
+  cameraOn: boolean = true;
 
 
 
@@ -101,16 +102,16 @@ export class CameraComponent implements OnInit {
     this.launched = true;
   }
 
-  ngOnInit() {
-  }
-
   captureIt(){
+    this.cameraOn = false;
     this.finalPhoto = true;
-    $('.webcam').addClass('_hidden');
     setTimeout(()=>{
       let width = $('.photoTaken').width();
       $('.photoTaken').height(width*0.75);
     },50)
+  }
+  reopenCamera(){
+    this.cameraOn = true;
   }
 
   minimizeIt(){
@@ -121,7 +122,7 @@ export class CameraComponent implements OnInit {
   }
 
   hideCapture(){
-      $('.photoTaken').addClass('_hidden');
+      this.finalPhoto = false;
   }
 
 

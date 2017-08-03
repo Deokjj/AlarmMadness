@@ -1,3 +1,4 @@
+// import 'youtube';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
@@ -13,9 +14,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MdButtonModule, MdCardModule, MdMenuModule, MdToolbarModule,
          MdIconModule, MdDialogModule, MdSnackBarModule, MdProgressSpinnerModule,
          MdInputModule, MdTooltipModule, MdSidenavModule, MdGridListModule,
-         MdSlideToggleModule, MdSelectModule, MdChipsModule } from '@angular/material';
+         MdSlideToggleModule, MdSelectModule, MdChipsModule} from '@angular/material';
 import { FormsModule, ReactiveFormsModule, FormArray, FormBuilder, FormGroup,
          Validators } from '@angular/forms';
+import { YoutubePlayerModule } from 'ng2-youtube-player';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 
 
 import { DialogComponent } from './signuplogin/main/dialog/dialog.component';
@@ -65,7 +68,8 @@ import { UserService } from './services/user.service';
     MdGridListModule,
     MdSlideToggleModule,
     MdSelectModule,
-    MdChipsModule
+    MdChipsModule,
+    YoutubePlayerModule
   ],
   providers: [FaceService,
               UserService,
@@ -76,3 +80,5 @@ import { UserService } from './services/user.service';
                     MsgSnackComponent]
 })
 export class AppModule { }
+
+// platformBrowserDynamic().bootstrapModule(AppModule);

@@ -1,6 +1,6 @@
 <section id="cameraWrapper">
 
-  <ack-webcam class="webcam" [(ref)]="webcam" (onSuccess)="onCamSuccess($event)" (onError)="onCamError($event)"></ack-webcam>
+  <ack-webcam *ngIf="cameraOn" class="webcam" [(ref)]="webcam" (onSuccess)="onCamSuccess($event)" (onError)="onCamError($event)"></ack-webcam>
 
 
   <div *ngIf="finalPhoto" style="width: 100%; height: 600px" class="photoTaken" [style.background-image]="base64?'url('+base64+')':null"></div>

@@ -10,18 +10,102 @@
   md-chip{
     font-size: 1.2em;
     height:30px;
-    // text-align: center;
     line-height: 30px;
     font-weight: 100;
-    // background-color: rgba(236, 64, 122,0.3);
     i{
       float: right;
       margin-right: 10px;
       margin-top: 3px;
-      // color: $pink200;
+      cursor: pointer;
     }
     span{
       margin-left: 10px;
     }
+  }
+  md-chip:hover{
+    background-color: $bluegrey900;
+  }
+
+
+  .soonAlarm{
+    background-color: $pink400 !important;
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+  }
+  .soonAlarm:hover{
+    background-color: $pink600 !important;
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    animation-iteration-count: infinite;
+  }
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+
+youtube-player{
+  position: fixed;
+  z-index: 5;
+  top:100%;
+  left:100%;
+  transform: translate(-100%,-100%);
+
+}
+
+._hidden{
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+md-spinner{
+  width: 160px;
+  height: 160px;
+  position: absolute;
+  top:40%;
+  left:50%;
+  transform: translate(-50%, -50%);
+}
+
+.feed{
+  width: 35%;
+  margin: auto;
+
+  i{
+    margin-bottom: 20px;
+    margin-top: 10px;
+    color: $pink400;
+  }
+  md-card{
+    margin-top: 20px;
+  }
+
+  .example-header-image.deokjae {
+    background-image: url('https://scontent-mia3-1.xx.fbcdn.net/v/t31.0-8/18423154_1336382713113753_4059164658223049507_o.jpg?oh=14ea7ce4185bd102e1dfcb9c8e931fb4&oe=5A33D6C1');
+    background-size: cover;
+  }
+  .example-header-image.anth {
+    background-image: url('https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAA3QAAAAJGNkZGZjZjJiLTM0NzMtNGU4YS05MDBhLTIwZWViMTg2YWRkOQ.jpg');
+    background-size: cover;
+  }
+  p{
+    line-height: 1.2em;
   }
 }

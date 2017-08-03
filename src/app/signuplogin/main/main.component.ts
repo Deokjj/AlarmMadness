@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MdDialog } from '@angular/material';
 import { DialogComponent } from './dialog/dialog.component';
 import { UserService } from '../../services/user.service';
@@ -13,27 +13,21 @@ import { Router } from '@angular/router';
 
 
 
-export class MainComponent implements OnInit {
+export class MainComponent implements OnInit, OnDestroy {
   pmOrAm : string = "";
   updateInterval: any;
+  updateAmPm : any;
   currentUser: any = {};
 
 
   constructor(public dialog: MdDialog,
               private userService: UserService,
               private router: Router) {
-    setInterval(() => {
+    this.updateAmPm = setInterval(() => {
       var time = new Date();
       var hours = time.getHours();
       this.pmOrAm = hours >= 12 ? 'PM' : 'AM';
     },1000);
-  }
-
-  stopIntervalTime(){
-    console.log(this.updateInterval);
-    clearInterval(this.updateInterval);
-    console.log('hey!');
-    this.router.navigate(['/home']);
   }
 
   openDialog() {
@@ -41,6 +35,7 @@ export class MainComponent implements OnInit {
   }
 
   ngOnInit() {
+    //check if logged in previous, then route to home page
     this.userService.checklogin()
     .then((currentUserFromApi) => {
       this.router.navigate(['/home']);
@@ -61,12 +56,11 @@ export class MainComponent implements OnInit {
       updateClock: function (){
 
     		var time = new Date();
-
         var hours = time.getHours();
-        var minutes = time.getMinutes();
-        this.pmOrAm = hours >= 12 ? 'PM' : 'AM';
+
 
         hours = hours % 12;
+
         hours = hours ? hours : 12; // the hour '0' should be '12'
 
     		clock.clocktime.hour   = hours;
@@ -123,21 +117,28 @@ export class MainComponent implements OnInit {
     		clock.toggleDots();
     		clock.updateClock();
     		// // update every half second to make dots flash at that rate :)
-
     	}
 
     };
+    this.pmOrAm = new Date().getHours() >= 12 ? 'PM' : 'AM';
+    if(this.pmOrAm){
+      $('.pmOrAm').html("PM");
+    }
+    else{
+      $('.pmOrAm').html("AM");
+    }
+
     clock.init();
     this.updateInterval = setInterval(clock.updateClock, 500);
     /* FIX THIS FUNCTION SO IT UPDATES AM AND PM WHEN NEEDED */
-    console.log(this.updateInterval);
 
+  }//ngInIt ends
+
+  ngOnDestroy() {
+    clearInterval(this.updateInterval);
+    clearInterval(this.updateAmPm);
   }
 
-}
 
-// @Component({
-//   selector: 'introDialog',
-//   templateUrl: './introDialog.html',
-// })
-// export class introDialog {}
+
+}
