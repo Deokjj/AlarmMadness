@@ -268,7 +268,7 @@ export class SignupComponent implements OnInit {
       $('.mat-disabled').removeClass('mat-disabled');
     }
 
-    if(this.hasAlarm){
+    if(this.hasAlarm && !this.ringingViewBoolean){
       if(this.set.isSameOrBefore(this.now)){
         this.ringIt();
       }
@@ -420,6 +420,7 @@ export class SignupComponent implements OnInit {
     this.navContainer.close();
   }
 
+  //method to toggle between alarm and timer
   isAlarmCheckedToggle(){
     this.isAlarmChecked = this.isAlarmChecked ? false : true;
     this.isAlarmChecked ?
@@ -427,34 +428,72 @@ export class SignupComponent implements OnInit {
     this.isAlarmChecked ?
       $('.timerIcon').removeClass('pinkIt'): $('.timerIcon').addClass('pinkIt');
     $('.mat-disabled').removeClass('mat-disabled');
+
+    //Different validator form for alarm or timer
+    if(this.isAlarmChecked){
+      this.hoursFormControl = new FormControl('', [
+        Validators.required,
+        Validators.pattern(NUMBERONLY),
+        Validators.min(1),
+        Validators.max(12)
+      ]);
+    }
+    else{
+      this.hoursFormControl = new FormControl('',[
+        Validators.required,
+        Validators.pattern(NUMBERONLY),
+        Validators.min(0),
+        Validators.max(24)
+      ]);
+    }
   }
 
+  //method to toggle between PM and AM
   amPmToggle(){
     this.isPM = this.isPM ? false : true;
     this.isPM ? $('.amBtn').html('PM') : $('.amBtn').html('AM');
   }
 
   createAlarm(){
-    //validate Am or PM and convert to 24 hour system
-    let amPmString = this.isPM ? "PM" : "AM";
-    // let hourInput = this.hoursInput
-    let timeString = `${this.hoursInput}:${this.minsInput}:${this.secsInput} ${amPmString}`;
+    //create alarm
+    if(this.isAlarmChecked){
+      //validate Am or PM and convert to 24 hour system
+      let amPmString = this.isPM ? "PM" : "AM";
+      // let hourInput = this.hoursInput
+      let timeString = `${this.hoursInput}:${this.minsInput}:${this.secsInput} ${amPmString}`;
 
-    let alarmSet = moment(timeString, ["h:mm:ss A"]);
-    if( alarmSet.isSameOrBefore(moment()) ){
-      alarmSet.add(1,'days');
-    } //the alarm Time set.
+      let alarmSet = moment(timeString, ["h:mm:ss A"]);
+      if( alarmSet.isSameOrBefore(moment()) ){
+        alarmSet.add(1,'days');
+      } //the alarm Time set.
 
-    this.userService.newAlarm
-    (this.currentUser._id,alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ'),moment().toString(),this.selectedAudio)
-    .then((res)=>{
-        this.refreshAlarm()
-        .then((res)=>{
-          console.log("newAlarm set is :", alarmSet);
-          console.log("hasAlarm: ", this.hasAlarm);
-          console.log("soonest set is: ", this.set);
-        });
-    });
+      this.userService.newAlarm
+      (this.currentUser._id,alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ'),moment().toString(),this.selectedAudio)
+      .then((res)=>{
+          this.refreshAlarm()
+          .then((res)=>{
+            console.log("newAlarm set is :", alarmSet);
+            console.log("hasAlarm: ", this.hasAlarm);
+            console.log("soonest set is: ", this.set);
+          });
+      });
+    }
+    //create timer
+    else{
+      let alarmSet = moment().add(this.hoursInput, 'hours')
+                             .add(this.minsInput, 'minutes')
+                             .add(this.secsInput, 'seconds');
+      this.userService.newAlarm
+      (this.currentUser._id,alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ'),moment().toString(),this.selectedAudio)
+      .then((res)=>{
+          this.refreshAlarm()
+          .then((res)=>{
+            console.log("newAlarm set is :", alarmSet);
+            console.log("hasAlarm: ", this.hasAlarm);
+            console.log("soonest set is: ", this.set);
+          });
+      });
+    }
     this.hoursInput = undefined;
     this.minsInput = undefined;
     this.secsInput = undefined;
@@ -508,6 +547,25 @@ export class SignupComponent implements OnInit {
     });
   }
 
+  deleteAlarm(alarmArrayIndex){
+    console.log('hello, index is: ', alarmArrayIndex);
+    console.log('time of alarm at i is: ', this.alarmTimeToDisplay[alarmArrayIndex].timeSet);
+
+    return this.userService.deleteAlarm
+    (this.currentUser._id, this.alarmTimeToDisplay[alarmArrayIndex].timeSet)
+    .then((res)=>{
+      this.refreshAlarm()
+      .then((res)=>{
+        if(!this.alarmTimeToDisplay[0]){
+          this.hasAlarm = false;
+          this.set = undefined;
+        }
+        console.log('hasAlarm after deletion: ', this.hasAlarm );
+        console.log('timeSet after deletion: ', this.set);
+      })
+    });
+  }
+
 
   savePlayer (player) {
     this.player = player;
@@ -526,11 +584,11 @@ export class SignupComponent implements OnInit {
   }
 
   ringIt(){
-    this.set = undefined;
-    this.alarm = {};
-    this.hasAlarm = false;
+    // this.alarm = {};
+    // this.hasAlarm = false;
     this.background.switchBackground();
     this.ringingViewBoolean = true;
+    this.set = undefined;
     $('.ytp-icon-large-play-button-hover').remove();
     setTimeout(()=>{this.playVideo()},1500);
   }
@@ -540,12 +598,12 @@ export class SignupComponent implements OnInit {
   continueBoolean: boolean = false
 
   proceedToUnlock(){
-    this.unlocking = true;
-    console.log('clicked');
-    this.showMesseges();
-    this.cameraComponent.reopenCamera();
-    this.launched = true
-    $('.firstLine').html("Open your eyes and mouth wide 😲");
+    // this.unlocking = true;
+    // console.log('clicked');
+    // this.showMesseges();
+    // this.cameraComponent.reopenCamera();
+    // this.launched = true
+    // $('.firstLine').html("Open your eyes and mouth wide 😲");
     // setTimeout(()=>{
     //   this.cameraComponent.visionDetect()
     //   .then( res => {
@@ -553,6 +611,24 @@ export class SignupComponent implements OnInit {
     //
     //   })
     // },3000);
+    this.userService.deleteAlarm
+    (this.currentUser._id,this.alarmTimeToDisplay[0].timeSet)
+    .then((res)=>{
+      this.refreshAlarm()
+      .then((res)=>{
+        if(!this.alarmTimeToDisplay[0]){
+          this.hasAlarm = false;
+          this.set = undefined;
+          console.log("there isn't more alarm! hasalarm: ", this.hasAlarm);
+        }
+        this.background.switchBackground();
+        this.ringingViewBoolean = false;
+      })
+    });
+
+  }
+
+  unlock(){
 
   }
 

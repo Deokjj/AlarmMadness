@@ -161,7 +161,8 @@
         <span>
           {{alarm.timeSet.slice(16,27)}}
           <!-- {{alarm.timeSet.slice(16,18)}}{{ alarm.timeSet.slice(18, 24) }} {{ ( alarm.timeSet.slice(16,18)>=12 )? "PM":"AM" }} -->
-        </span> <i class="material-icons">close</i>
+        </span>
+        <i class="material-icons" (click)="deleteAlarm(i)">close</i>
       </md-chip>
       <!-- <md-chip>Naan</md-chip>
       <md-chip>Dal</md-chip> -->

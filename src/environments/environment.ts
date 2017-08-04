@@ -5,5 +5,6 @@
 
 export const environment = {
   production: false,
-  apiBase: 'http://localhost:3000'
+  apiBase: 'http://localhost:3000',
+  googleKey: 'AIzaSyAUz5OS7yIcPzYX0nHN3RC7FSbexR2iH3U'
 };

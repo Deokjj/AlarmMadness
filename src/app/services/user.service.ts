@@ -118,4 +118,18 @@ export class UserService {
      .then(res => res.json());
   }
 
+  deleteAlarm(id,timeSet){
+    return this.http
+     .patch(
+       environment.apiBase +'/api/deleteAlarm',
+       {
+         id: id,
+         timeSet: timeSet  //alarm with the same timeSet to be deleted
+       },
+       { withCredentials: true }
+     )
+     .toPromise()
+     .then(res=> res.json());
+  }
+
 }

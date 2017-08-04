@@ -2,10 +2,12 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 
+import { environment } from '../../environments/environment';
+
 @Injectable()
 export class FaceService {
-
-  baseUrl = "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyAUz5OS7yIcPzYX0nHN3RC7FSbexR2iH3U";
+  
+  baseUrl = "https://vision.googleapis.com/v1/images:annotate?key=" + environment.googleKey;
 
   constructor(private http: Http) { }
 
