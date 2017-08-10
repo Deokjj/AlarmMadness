@@ -1,0 +1,62 @@
+@import "~assets/colors.scss";
+
+.search{
+  width: 70%;
+  font-size: 1.5em;
+  margin-left: 15%;
+  position: relative;
+  transform: translateY(-10px);
+  margin-bottom: 10px;
+
+  md-hint{
+    font-weight: 100;
+  }
+}
+
+.ytWrapper{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-content: center;
+  margin-bottom: 5px;
+}
+
+.resultContainer{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: center;
+  align-content: space-between;
+
+  a{
+    padding: 0;
+    margin: 10px auto;
+    text-align: left;
+    line-height: 1.1em;
+  }
+  md-card{
+    width:400px;
+  }
+
+  img{
+    height: 300px;
+    object-fit: cover;
+  }
+  .selected{
+    background-color: $rgbaBack;
+  }
+  md-progress-bar{
+    position: absolute;
+    z-index: 10;
+  }
+}
+
+md-paginator{
+  margin-top: 5px;
+  font-size: 1.2em;
+
+  .mat-paginator-page-size-label{
+    font-size: 0.8em !important;
+  }
+}

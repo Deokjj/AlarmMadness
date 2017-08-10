@@ -1,6 +1,6 @@
 import * as jQuery from 'jquery';
 import * as moment from 'moment';
-// import * as fs from 'fs';
+
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CameraComponent } from '../../camera/camera.component';
 import { BackgroundComponent } from '../../background/background.component';
@@ -10,23 +10,25 @@ import { FormControl, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { FileUploader } from 'ng2-file-upload';
+import { YoutubeSearchComponent } from './youtube-search/youtube-search.component';
+import { MdDialog, MdDialogRef } from '@angular/material';
 // import { AwsService } from '../../services/aws.service';
 
-// import { SnackServiceService } from './msg-snack/snack-service.service';
 
 const NAME_REGEX = /^([ \u00c0-\u01ffa-zA-Z'\-])+$/;
 const NUMBERONLY = /^\d+$/;
 
 @Component({
-  selector: 'app-signup',
-  templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.scss',
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss',
               './addIt.scss']
 })
-export class SignupComponent implements OnInit {
+export class HomeComponent implements OnInit {
   @ViewChild(CameraComponent) cameraComponent: CameraComponent;
   @ViewChild(BackgroundComponent) background : BackgroundComponent;
   @ViewChild(MdSidenavContainer) navContainer: MdSidenavContainer;
+  @ViewChild(YoutubeSearchComponent) youtubeDialog: YoutubeSearchComponent;
 
   // input initializing
   nameInput: string;
@@ -40,6 +42,8 @@ export class SignupComponent implements OnInit {
   toAlarmBoolean: boolean = true;
   toFeedBoolean: boolean = false;
   ringingViewBoolean: boolean =false;
+  showYtVideo: boolean = false;
+  ytVideoPlayed: boolean  = false;
   //
 
   launched:boolean = false; //Ready btn Clicked
@@ -92,10 +96,11 @@ export class SignupComponent implements OnInit {
   ]);
 
   sounds = [
-    {value: 'morning', viewValue: 'Morning Alarm'},
-    {value: 'beeping', viewValue: 'Beeping Sound'},
-    {value: 'youtube', viewValue: 'Freakum'}
+    {value: 'RbiEESkyaeM', viewValue: 'Morning Alarm'},
+    {value: 'QH2-TGUlwu4', viewValue: 'Nyan Cat'},
+    {value: '-', viewValue: 'Search Youtube'}
   ];
+  title: string = '';
 
 
     hoursFormControl = new FormControl('', [
@@ -118,13 +123,17 @@ export class SignupComponent implements OnInit {
     ]);
 
     player: YT.Player;
-    ytId: string = '-HXySf-Fa3U';
+    ytId: string = 'QH2-TGUlwu4'; //Nyan Cat
+    // 'RbiEESkyaeM'; // Good Morning
+    // '-HXySf-Fa3U'; // Freakum
 
   constructor(
     public snackBar: MdSnackBar,
     private userService: UserService,
     // private awsService: AwsService,
-    private router: Router) {
+    // private youtubeService: YoutubeService,
+    private router: Router,
+    public dialog: MdDialog) {
     if(!this.currentUser){
       console.log("no User");
     }
@@ -132,6 +141,7 @@ export class SignupComponent implements OnInit {
     setInterval(()=>{
       this.now = Date.now();
     },500)
+
   }
 
   ngOnInit() {
@@ -274,7 +284,28 @@ export class SignupComponent implements OnInit {
       }
     }
 
+    if(this.player &&
+      this.ytVideoPlayed &&
+      (this.player.getPlayerState() ===0 ||
+      this.player.getPlayerState() === 2 ) ){
+      // ||
+      // this.player.getVolume() !== 100 ||
+      // this.player.isMuted)){
+      this.player.playVideo();
+      // this.player.setVolume(100);
+      // this.player.unMute();
 
+    }
+
+    if(this.searchDialog && this.searchDialog.componentInstance.items){
+      if(this.searchDialog.componentInstance.items[2] ||
+        this.searchDialog.componentInstance.player){
+        this.searchDialog.updateSize('height', '90%');
+      }
+      else{
+        this.searchDialog.updateSize('height', 'auto');
+      }
+    }
   }//end of ngDoCheck
 
 
@@ -330,22 +361,6 @@ export class SignupComponent implements OnInit {
   }
 
   signUp(){
-
-    // this.imgUpload.onSuccessItem = (item, response) => {
-    //   return;
-    // }
-    // this.imgUpload.onErrorItem = (item, response) => {
-    //   this.message = "Oops something went wrong :(";
-    //   return;
-    // }
-    // this.imgUpload.onBuildItemForm = (item, formToBeSent) => {
-    //   for (let fieldName in form.value) {
-    //     formToBeSent.append(fieldName, form.value[fieldName]);
-    //   }
-    //
-    // }
-
-    // this.imgUpload.uploadAll();
 
     this.userService.signup(this.nameInput, this.passwordInput, undefined)
     .then((resultFromApi) => {
@@ -454,6 +469,32 @@ export class SignupComponent implements OnInit {
     this.isPM ? $('.amBtn').html('PM') : $('.amBtn').html('AM');
   }
 
+
+  audioSelect(val){
+    if(val === this.sounds[0].value){
+      this.title = "Morning";
+    }
+    else if(val === this.sounds[1].value){
+      this.title = "Nyan Cat"
+    }
+  }
+
+  searchDialog: MdDialogRef<YoutubeSearchComponent>;
+  //Only when 'Youtube Search' is selected
+  openSearchDialog(){
+    this.searchDialog = this.dialog.open(YoutubeSearchComponent,{
+      height: 'auto',
+      width: '1000px'
+    });
+
+    this.searchDialog.afterClosed().subscribe(result => {
+      this.sounds[2].value = this.searchDialog.componentInstance.selectedId;
+      this.selectedAudio = this.searchDialog.componentInstance.selectedId;
+      this.title = this.searchDialog.componentInstance.titleOfSelected;
+      this.searchDialog = undefined; // clean up dialog ref.
+    });
+  }
+
   createAlarm(){
     //create alarm
     if(this.isAlarmChecked){
@@ -468,7 +509,7 @@ export class SignupComponent implements OnInit {
       } //the alarm Time set.
 
       this.userService.newAlarm
-      (this.currentUser._id,alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ'),moment().toString(),this.selectedAudio)
+      (this.currentUser._id,alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ'),moment().toString(),this.selectedAudio,this.title)
       .then((res)=>{
           this.refreshAlarm()
           .then((res)=>{
@@ -484,7 +525,7 @@ export class SignupComponent implements OnInit {
                              .add(this.minsInput, 'minutes')
                              .add(this.secsInput, 'seconds');
       this.userService.newAlarm
-      (this.currentUser._id,alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ'),moment().toString(),this.selectedAudio)
+      (this.currentUser._id,alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ'),moment().toString(),this.selectedAudio,this.title)
       .then((res)=>{
           this.refreshAlarm()
           .then((res)=>{
@@ -498,6 +539,10 @@ export class SignupComponent implements OnInit {
     this.minsInput = undefined;
     this.secsInput = undefined;
     this.selectedAudio = undefined;
+    this.sounds[2].value = '-';
+    this.title = "";
+    console.log(this.title);
+    console.log(this.sounds);
   }
 
   insertionSort(items) {
@@ -542,6 +587,7 @@ export class SignupComponent implements OnInit {
     .then((res)=>{
       if(this.alarmTimeToDisplay[0]){
         this.set = moment(this.alarmTimeToDisplay[0].timeSet);
+        this.ytId = this.alarmTimeToDisplay[0].soundSet.id;
         this.hasAlarm = true;
       }
     });
@@ -584,13 +630,15 @@ export class SignupComponent implements OnInit {
   }
 
   ringIt(){
-    // this.alarm = {};
-    // this.hasAlarm = false;
     this.background.switchBackground();
     this.ringingViewBoolean = true;
+    this.showYtVideo = true;
     this.set = undefined;
-    $('.ytp-icon-large-play-button-hover').remove();
-    setTimeout(()=>{this.playVideo()},1500);
+    $('.ytOverlap').addClass('removeAllEvents');
+    setTimeout(()=>{
+      this.playVideo();
+      this.ytVideoPlayed = true;
+    },2000);
   }
   unlocking: boolean = false;
   unlockdetectStarted: boolean = true;
@@ -623,6 +671,10 @@ export class SignupComponent implements OnInit {
         }
         this.background.switchBackground();
         this.ringingViewBoolean = false;
+        this.showYtVideo = false;
+        this.ytVideoPlayed = false;
+        $('.ytOverlap').removeClass('removeAllEvents');
+
       })
     });
 

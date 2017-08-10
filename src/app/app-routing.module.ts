@@ -3,13 +3,11 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
 
-import { MainComponent } from './signuplogin/main/main.component';
+import { MainComponent } from './pages/main/main.component';
 import { WebCamComponent } from 'ack-angular-webcam';
 import { CameraComponent } from './camera/camera.component';
-import { SignupComponent } from './signuplogin/signup/signup.component';
+import { HomeComponent } from './pages/home/home.component';
 import { BackgroundComponent } from './background/background.component';
-// import { LoginComponent } from './signuplogin/login/login.component';
-// import { HomeComponent } from './main/home/home.component';
 
 const routes: Routes = [
   {
@@ -18,7 +16,7 @@ const routes: Routes = [
   },
   {
     path: 'home',
-    component: SignupComponent
+    component: HomeComponent
   }
 ];
 

@@ -160,12 +160,9 @@
       <md-chip *ngFor="let alarm of alarmTimeToDisplay ; let i = index" [ngClass]="{'soonAlarm': 0 == i}">
         <span>
           {{alarm.timeSet.slice(16,27)}}
-          <!-- {{alarm.timeSet.slice(16,18)}}{{ alarm.timeSet.slice(18, 24) }} {{ ( alarm.timeSet.slice(16,18)>=12 )? "PM":"AM" }} -->
         </span>
         <i class="material-icons" (click)="deleteAlarm(i)">close</i>
       </md-chip>
-      <!-- <md-chip>Naan</md-chip>
-      <md-chip>Dal</md-chip> -->
     </md-chip-list>
 
   </div>
@@ -223,11 +220,19 @@
     <md-grid-list cols="1" rowHeight="9:1">
       <md-grid-tile>
 
-        <md-select placeholder="Sound" [(ngModel)]="selectedAudio" name="selectedAudio">
-          <md-option *ngFor="let sound of sounds" [value]="sound.value">
+        <md-select placeholder="Sound" [(ngModel)]="selectedAudio"
+        (ngModelChange)="audioSelect($event)" name="selectedAudio">
+          <md-option *ngFor="let sound of sounds; let i = index"
+          [value]="sound.value" (click)="i === 2 ? openSearchDialog() : undefined">
             {{ sound.viewValue }}
           </md-option>
         </md-select>
+
+        <div class="ytNameDisplay"
+        *ngIf="title !== 'Morning' &&
+               title !== 'Nyan Cat' ">
+         <span>{{title.length >16 ? title.slice(0,16) + '...' : title}}</span>
+        </div>
 
       </md-grid-tile>
     </md-grid-list>
@@ -236,7 +241,7 @@
       <md-grid-tile>
         <button md-raised-button
         [disabled]="hoursFormControl.errors || minsFormControl.errors ||
-        secsFormControl.errors || !selectedAudio">
+        secsFormControl.errors || !selectedAudio || selectedAudio === '-'">
           <span
           [mdTooltip]="(hoursFormControl.errors || minsFormControl.errors ||
           secsFormControl.errors || !selectedAudio) ?
@@ -265,11 +270,14 @@
    </div>
   </div>
 
+  <div class="ytOverlap">
+
   <youtube-player
       [videoId]="ytId"
       (ready)="savePlayer($event)"
       (change)="onStateChange($event)"
-      width='500' *ngIf="ringingViewBoolean"></youtube-player>
+      width='480' height='270' *ngIf="showYtVideo"></youtube-player>
+  </div>
 
   <md-spinner *ngIf="unlocking && !this.cameraComponent.launched"></md-spinner>
 

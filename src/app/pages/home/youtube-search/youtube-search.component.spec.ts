@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HomeComponent } from './home.component';
+import { YoutubeSearchComponent } from './youtube-search.component';
 
-describe('HomeComponent', () => {
-  let component: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
+describe('YoutubeSearchComponent', () => {
+  let component: YoutubeSearchComponent;
+  let fixture: ComponentFixture<YoutubeSearchComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ HomeComponent ]
+      declarations: [ YoutubeSearchComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(HomeComponent);
+    fixture = TestBed.createComponent(YoutubeSearchComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

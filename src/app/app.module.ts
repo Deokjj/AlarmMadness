@@ -1,37 +1,39 @@
-// import 'youtube';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'hammerjs';
-// import 'aws-sdk/clients/s3';ß
+
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { MainComponent } from './signuplogin/main/main.component';
+import { MainComponent } from './pages/main/main.component';
 //Angular Material Animation Module
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { MdButtonModule, MdCardModule, MdMenuModule, MdToolbarModule,
          MdIconModule, MdDialogModule, MdSnackBarModule, MdProgressSpinnerModule,
          MdInputModule, MdTooltipModule, MdSidenavModule, MdGridListModule,
-         MdSlideToggleModule, MdSelectModule, MdChipsModule} from '@angular/material';
+         MdSlideToggleModule, MdSelectModule, MdChipsModule, MdPaginatorModule,
+         MdProgressBarModule} from '@angular/material';
+
 import { FormsModule, ReactiveFormsModule, FormArray, FormBuilder, FormGroup,
          Validators } from '@angular/forms';
 import { YoutubePlayerModule } from 'ng2-youtube-player';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 
 
-import { DialogComponent } from './signuplogin/main/dialog/dialog.component';
-import { SignupComponent } from './signuplogin/signup/signup.component';
+import { DialogComponent } from './pages/main/dialog/dialog.component';
+import { HomeComponent } from './pages/home/home.component';
 import { WebCamComponent } from 'ack-angular-webcam';
 import { CameraComponent } from './camera/camera.component';
 import { BackgroundComponent } from './background/background.component';
-import { MsgSnackComponent } from './signuplogin/signup/msg-snack/msg-snack.component';
-import { LoginComponent } from './signuplogin/login/login.component';
-import { HomeComponent } from './main/home/home.component';
+import { MsgSnackComponent } from './pages/home/msg-snack/msg-snack.component';
 
 import { FaceService } from './services/face.service';
 import { UserService } from './services/user.service';
+import { YoutubeService } from './services/youtube.service';
+import { YoutubeSearchComponent } from './pages/home/youtube-search/youtube-search.component';
 // import { AwsService } from './services/aws.service';
 
 @NgModule({
@@ -39,13 +41,12 @@ import { UserService } from './services/user.service';
     AppComponent,
     MainComponent,
     DialogComponent,
-    SignupComponent,
+    HomeComponent,
     WebCamComponent,
     CameraComponent,
     BackgroundComponent,
     MsgSnackComponent,
-    LoginComponent,
-    HomeComponent
+    YoutubeSearchComponent,
   ],
   imports: [
     BrowserModule,
@@ -69,16 +70,18 @@ import { UserService } from './services/user.service';
     MdSlideToggleModule,
     MdSelectModule,
     MdChipsModule,
-    YoutubePlayerModule
+    YoutubePlayerModule,
+    MdPaginatorModule,
+    MdProgressBarModule
   ],
   providers: [FaceService,
               UserService,
+              YoutubeService
               // AwsService
             ],
   bootstrap: [AppComponent],
   entryComponents: [DialogComponent,
-                    MsgSnackComponent]
+                    MsgSnackComponent,
+                    YoutubeSearchComponent]
 })
 export class AppModule { }
-
-// platformBrowserDynamic().bootstrapModule(AppModule);

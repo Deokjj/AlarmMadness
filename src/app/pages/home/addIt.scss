@@ -59,14 +59,14 @@
 }
 
 
-youtube-player{
-  position: fixed;
-  z-index: 5;
-  top:100%;
-  left:100%;
-  transform: translate(-100%,-100%);
-
-}
+// youtube-player{
+//   position: fixed;
+//   z-index: 5;
+//   top:100%;
+//   left:100%;
+//   transform: translate(-100%,-100%);
+//
+// }
 
 ._hidden{
   visibility: hidden;
@@ -107,5 +107,27 @@ md-spinner{
   }
   p{
     line-height: 1.2em;
+  }
+}
+
+.ytOverlap{
+  position: fixed;
+  z-index: 5;
+  top:100%;
+  left:100%;
+  transform: translate(-100%,-100%);
+}
+.removeAllEvents{
+  pointer-events: none;
+}
+
+.ytNameDisplay{
+  position: absolute;
+  transform: translateX(50%);
+  margin-left: 75px;
+  font-size: 0.4em;
+  font-weight: 100;
+  span{
+    color: $pink200;
   }
 }

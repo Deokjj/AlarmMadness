@@ -101,7 +101,7 @@ export class UserService {
         .then(res => res.json());
   } // close checklogin()
 
-  newAlarm(id,timeSet, alarmCreatedAt, soundSet){
+  newAlarm(id,timeSet, alarmCreatedAt, soundSet, title){
     return this.http
      .patch(
       //  'http://localhost:3000/api/newalarm',
@@ -110,7 +110,8 @@ export class UserService {
          id: id,
          timeSet: timeSet,
          alarmCreatedAt: alarmCreatedAt,
-         soundSet: soundSet
+         soundSet: soundSet,
+         title: title
        },
        { withCredentials: true }
      )

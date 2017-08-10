@@ -1,0 +1,47 @@
+<md-input-container class="search">
+  <input mdInput maxlength="25" placeholder="Search"
+  [(ngModel)] = "searchTerm" (ngModelChange) = "searchYt($event,undefined)">
+  <md-hint align="end" *ngIf="!totalN"
+  style="font-size: 0.7em"> Search Your Favorite Youtube Video </md-hint>
+  <md-hint align="end" *ngIf="totalN"
+  style="font-size: 0.9em"> {{totalN === 1000000? 'Over 1M' : totalN}} Results </md-hint>
+</md-input-container>
+
+<div class="ytWrapper">
+  <youtube-player
+      [(videoId)]="selectedId"
+      (ready)="savePlayer($event)"
+      (change)="onStateChange($event)"
+      width='800' height='450' *ngIf="selectedId"></youtube-player>
+</div>
+
+<div class="resultContainer" *ngIf="items">
+
+  <a md-button *ngFor="let item of items; let i = index" (click)="select(i)">
+    <md-progress-bar mode="indeterminate" *ngIf="selectedIndex === i"></md-progress-bar>
+    <md-card [ngClass]="{'selected': selectedIndex == i}">
+      <img md-card-image src="{{item.snippet.thumbnails.high.url}}">
+      <md-card-header>
+
+        <md-card-title>{{item.snippet.title.slice(0,45)}} {{item.snippet.title.length>44 ? '...' : ''}}</md-card-title>
+        <md-card-subtitle>{{item.snippet.channelTitle}}</md-card-subtitle>
+      </md-card-header>
+      <md-card-content>
+        <p *ngIf="item.snippet.description">
+          {{item.snippet.description.slice(0,55)}} {{item.snippet.description.length>54 ? '...' : ''}}
+        </p>
+        <p *ngIf="!item.snippet.description" style ="color: gray">
+          No Description
+        </p>
+      </md-card-content>
+    </md-card>
+  </a>
+
+</div>
+
+<md-paginator *ngIf="items"
+              length= "{{totalN}}"
+              [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions"
+              (page)="pageChange($event)">
+</md-paginator>
