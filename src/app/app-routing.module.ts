@@ -8,6 +8,7 @@ import { WebCamComponent } from 'ack-angular-webcam';
 import { CameraComponent } from './camera/camera.component';
 import { HomeComponent } from './pages/home/home.component';
 import { BackgroundComponent } from './background/background.component';
+import { YoutubeSearchComponent } from './pages/home/youtube-search/youtube-search.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,14 @@ const routes: Routes = [
   {
     path: 'home',
     component: HomeComponent
+  },
+  {
+    path: 'youtube',
+    component: YoutubeSearchComponent
+  },
+  {
+    path: 'camera',
+    component: CameraComponent
   }
 ];
 

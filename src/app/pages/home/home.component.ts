@@ -204,8 +204,7 @@ export class HomeComponent implements OnInit {
         $('.secondLine').removeClass('_hidden');
       }
       else if(
-        this.cameraComponent.faceAnno[0].headwearLikelihood === 'VERY_LIKELY' ||
-        this.cameraComponent.faceAnno[0].headwearLikelihood === 'LIKELY'){
+        this.cameraComponent.faceAnno[0].headwearLikelihood === 'VERY_LIKELY'){
           $('.firstLine').html(`Take off your hat please. Now, try again`);
           $('.secondLine').addClass('_hidden');
       }
@@ -288,12 +287,8 @@ export class HomeComponent implements OnInit {
       this.ytVideoPlayed &&
       (this.player.getPlayerState() ===0 ||
       this.player.getPlayerState() === 2 ) ){
-      // ||
-      // this.player.getVolume() !== 100 ||
-      // this.player.isMuted)){
+
       this.player.playVideo();
-      // this.player.setVolume(100);
-      // this.player.unMute();
 
     }
 
@@ -646,9 +641,11 @@ export class HomeComponent implements OnInit {
   continueBoolean: boolean = false
 
   proceedToUnlock(){
-    // this.unlocking = true;
-    // console.log('clicked');
-    // this.showMesseges();
+    this.unlocking = true;
+    this.cameraOn = true;
+    this.showMesseges();
+    console.log(this.unlocking);
+    console.log(this.cameraOn);
     // this.cameraComponent.reopenCamera();
     // this.launched = true
     // $('.firstLine').html("Open your eyes and mouth wide 😲");
@@ -659,6 +656,10 @@ export class HomeComponent implements OnInit {
     //
     //   })
     // },3000);
+
+  }
+
+  unlock(){
     this.userService.deleteAlarm
     (this.currentUser._id,this.alarmTimeToDisplay[0].timeSet)
     .then((res)=>{
@@ -677,10 +678,6 @@ export class HomeComponent implements OnInit {
 
       })
     });
-
-  }
-
-  unlock(){
 
   }
 

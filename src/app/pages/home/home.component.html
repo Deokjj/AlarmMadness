@@ -279,7 +279,7 @@
       width='480' height='270' *ngIf="showYtVideo"></youtube-player>
   </div>
 
-  <md-spinner *ngIf="unlocking && !this.cameraComponent.launched"></md-spinner>
+  <md-spinner *ngIf="unlocking && (!this.cameraComponent || !this.cameraComponent.launched) "></md-spinner>
 
   <div class="feed">
     <md-card class="example-card" *ngIf="toFeedBoolean">

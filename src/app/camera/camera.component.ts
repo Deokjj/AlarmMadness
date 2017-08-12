@@ -1,7 +1,8 @@
-import { Component} from '@angular/core';
+import { Component, ViewChild, AfterViewInit} from '@angular/core';
 import { Http, Request } from '@angular/http';
 import { FaceService } from '../services/face.service';
-import 'aws-sdk/dist/aws-sdk';
+// import 'aws-sdk/dist/aws-sdk';
+
 
 
 @Component({
@@ -9,12 +10,12 @@ import 'aws-sdk/dist/aws-sdk';
   templateUrl: './camera.component.html',
   styleUrls: ['./camera.component.scss']
 })
-export class CameraComponent{
+export class CameraComponent implements AfterViewInit{
 
   public webcam//will be populated by ack-webcam [(ref)]
   public base64
 
-  faceAnno: object;
+  faceAnno: any;
   faceCount: number;
   labelAnno: object;
 
@@ -24,10 +25,25 @@ export class CameraComponent{
   finalPhoto: boolean = false;
   cameraOn: boolean = true;
 
+  @ViewChild("canvas") canvas;
+  context:CanvasRenderingContext2D;
+
 
 
   constructor(public http:Http,
               private faceService: FaceService) {
+  }
+
+  ngAfterViewInit() {
+    this.context = this.canvas.nativeElement.getContext('2d');
+    $('canvas').css('top', '10vh');
+    $('canvas').css('left','22%');
+    this.context.canvas.width = document.getElementById('cameraWrapper').clientWidth;
+    this.context.canvas.height = this.context.canvas.width * 0.75;
+
+    // this.context.strokeStyle = 'blue';
+    // this.context.lineWidth = 2;
+    // this.context.strokeRect(0,0,this.context.canvas.width, this.context.canvas.height);
   }
 
   /*  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -108,10 +124,26 @@ export class CameraComponent{
     setTimeout(()=>{
       let width = $('.photoTaken').width();
       $('.photoTaken').height(width*0.75);
+
+      this.drawFaceBounding();
     },50)
   }
-  reopenCamera(){
-    this.cameraOn = true;
+
+  drawFaceBounding(){
+    let img = new Image();
+    img.src = this.base64;
+    let actualToClientSizeConverse =
+    document.getElementById('cameraWrapper').clientWidth / img.width;
+
+    this.context.strokeStyle = '#e91e63';
+    this.context.lineWidth = 3;
+    let x = this.faceAnno[0].fdBoundingPoly.vertices[0].x * actualToClientSizeConverse;
+    let y =this.faceAnno[0].fdBoundingPoly.vertices[0].y * actualToClientSizeConverse;
+    let dx = (this.faceAnno[0].fdBoundingPoly.vertices[2].x
+            - this.faceAnno[0].fdBoundingPoly.vertices[0].x) * actualToClientSizeConverse;
+    let dy = (this.faceAnno[0].fdBoundingPoly.vertices[2].y
+            - this.faceAnno[0].fdBoundingPoly.vertices[0].y) * actualToClientSizeConverse;
+    this.context.strokeRect(x,y,dx,dy);
   }
 
   minimizeIt(){
