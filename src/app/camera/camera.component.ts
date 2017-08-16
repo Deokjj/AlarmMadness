@@ -27,6 +27,7 @@ export class CameraComponent implements AfterViewInit{
 
   @ViewChild("canvas") canvas;
   context:CanvasRenderingContext2D;
+  actualToClientSizeConverse: number;
 
 
 
@@ -38,12 +39,14 @@ export class CameraComponent implements AfterViewInit{
     this.context = this.canvas.nativeElement.getContext('2d');
     $('canvas').css('top', '10vh');
     $('canvas').css('left','22%');
-    this.context.canvas.width = document.getElementById('cameraWrapper').clientWidth;
-    this.context.canvas.height = this.context.canvas.width * 0.75;
+    this.context.canvas.width =
+        document.getElementById('cameraWrapper').clientWidth + 180;
+    this.context.canvas.height =
+        document.getElementById('cameraWrapper').clientWidth * 0.75;
 
-    // this.context.strokeStyle = 'blue';
-    // this.context.lineWidth = 2;
-    // this.context.strokeRect(0,0,this.context.canvas.width, this.context.canvas.height);
+    this.context.strokeStyle = '#e91e63';
+    this.context.lineWidth = 4;
+    this.context.font = '18px Roboto';
   }
 
   /*  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -70,6 +73,9 @@ export class CameraComponent implements AfterViewInit{
         console.log(this.faceAnno);
         console.log(this.labelAnno);
         console.log(this.faceCount, "faces");
+
+        this.drawFaceBounding();
+
       })
     }) //assign base64 encoded to this.base64
     .catch( e=>console.error(e) )
@@ -124,26 +130,44 @@ export class CameraComponent implements AfterViewInit{
     setTimeout(()=>{
       let width = $('.photoTaken').width();
       $('.photoTaken').height(width*0.75);
-
-      this.drawFaceBounding();
     },50)
   }
 
   drawFaceBounding(){
+    if(!this.faceAnno){
+      return;
+    }
+    console.log('drawingFaceBounding');
     let img = new Image();
     img.src = this.base64;
     let actualToClientSizeConverse =
     document.getElementById('cameraWrapper').clientWidth / img.width;
 
-    this.context.strokeStyle = '#e91e63';
-    this.context.lineWidth = 3;
-    let x = this.faceAnno[0].fdBoundingPoly.vertices[0].x * actualToClientSizeConverse;
-    let y =this.faceAnno[0].fdBoundingPoly.vertices[0].y * actualToClientSizeConverse;
-    let dx = (this.faceAnno[0].fdBoundingPoly.vertices[2].x
-            - this.faceAnno[0].fdBoundingPoly.vertices[0].x) * actualToClientSizeConverse;
-    let dy = (this.faceAnno[0].fdBoundingPoly.vertices[2].y
-            - this.faceAnno[0].fdBoundingPoly.vertices[0].y) * actualToClientSizeConverse;
-    this.context.strokeRect(x,y,dx,dy);
+    this.faceAnno.forEach((faceAnno)=>{
+      let x =faceAnno.fdBoundingPoly.vertices[0].x * actualToClientSizeConverse;
+      let y = faceAnno.fdBoundingPoly.vertices[0].y * actualToClientSizeConverse;
+      let dx = (faceAnno.fdBoundingPoly.vertices[2].x
+              -faceAnno.fdBoundingPoly.vertices[0].x) * actualToClientSizeConverse;
+      let dy = (faceAnno.fdBoundingPoly.vertices[2].y
+              -faceAnno.fdBoundingPoly.vertices[0].y) * actualToClientSizeConverse;
+      this.context.strokeRect(x,y,dx,dy);
+
+      this.context.fillStyle = 'rgba(38, 50, 56,0.75)';
+      this.context.fillRect(x+dx+5,y-3,173,153);
+
+      this.context.fillStyle = '#c2185b';
+      this.context.fillText('😄  : ' +faceAnno.joyLikelihood.replace('_', ' '),x+dx+10, y + 20);
+      this.context.fillText('😔  : ' +faceAnno.sorrowLikelihood.replace('_', ' '),x+dx+10, y + 50);
+      this.context.fillText('😡  : ' +faceAnno.angerLikelihood.replace('_', ' '),x+dx+10, y + 80);
+      this.context.fillText('😲  : ' +faceAnno.surpriseLikelihood.replace('_', ' '),x+dx+10, y + 110);
+      this.context.fillText('🎩  : ' +faceAnno.headwearLikelihood.replace('_', ' '),x+dx+10, y + 140);
+    });
+  }
+
+  clearCanvas(){
+    this.context.clearRect
+    (0,0,document.getElementById('cameraWrapper').clientWidth + 180,
+         document.getElementById('cameraWrapper').clientWidth *0.75);
   }
 
   minimizeIt(){
@@ -154,7 +178,8 @@ export class CameraComponent implements AfterViewInit{
   }
 
   hideCapture(){
-      this.finalPhoto = false;
+      $('photoTaken').height(0);
+      this.base64 = '';
   }
 
 

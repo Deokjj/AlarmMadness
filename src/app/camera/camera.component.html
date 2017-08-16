@@ -3,7 +3,7 @@
   <ack-webcam *ngIf="cameraOn" class="webcam" [(ref)]="webcam" (onSuccess)="onCamSuccess($event)" (onError)="onCamError($event)"></ack-webcam>
 
 
-  <div *ngIf="finalPhoto" style="width: 100%; height: 600px" class="photoTaken" [style.background-image]="base64?'url('+base64+')':null"></div>
+  <div style="width: 100%; height: 0" class="photoTaken" [style.background-image]="base64?'url('+base64+')':null"></div>
 
   <canvas #canvas></canvas>
 

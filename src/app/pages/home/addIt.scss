@@ -115,7 +115,7 @@ md-spinner{
   z-index: 5;
   top:100%;
   left:100%;
-  transform: translate(-100%,-100%);
+  transform: translate(-100%,-98%);
 }
 .removeAllEvents{
   pointer-events: none;
@@ -130,4 +130,17 @@ md-spinner{
   span{
     color: $pink200;
   }
+}
+
+dice{
+  position: absolute;
+  z-index: 5;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%,-100%);
+}
+
+snack-bar-container{
+  max-width: none;
+  min-width: 0;
 }

@@ -1,0 +1,27 @@
+<div class="intro" *ngIf="intro">
+  <p>ROLL IT!</p>
+  <i class="material-icons arrowIcon">keyboard_arrow_down</i>
+</div>
+
+<section class="container" (click)="rolling || clickOff || roll()">
+  <div id="cube">
+    <div class="front">
+      <span class="dot dot1">😄</span>
+    </div>
+    <div class="back">
+      <span class="dot dot1">😄</span>
+    </div>
+    <div class="right">
+      <span class="dot dot1">😔</span>
+    </div>
+    <div class="left">
+      <span class="dot dot1">😔</span>
+    </div>
+    <div class="top">
+      <span class="dot dot1">😲</span>
+    </div>
+    <div class="bottom">
+      <span class="dot dot1">😲</span>
+    </div>
+  </div>
+</section>

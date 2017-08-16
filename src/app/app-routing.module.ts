@@ -9,6 +9,7 @@ import { CameraComponent } from './camera/camera.component';
 import { HomeComponent } from './pages/home/home.component';
 import { BackgroundComponent } from './background/background.component';
 import { YoutubeSearchComponent } from './pages/home/youtube-search/youtube-search.component';
+import { DiceComponent } from './pages/home/dice/dice.component';
 
 const routes: Routes = [
   {
@@ -26,6 +27,10 @@ const routes: Routes = [
   {
     path: 'camera',
     component: CameraComponent
+  },
+  {
+    path: 'dice',
+    component: DiceComponent
   }
 ];
 

@@ -254,7 +254,7 @@
 
   </form>
 
-  <div class="ring-container" *ngIf="ringingViewBoolean && !unlocking" (click)="proceedToUnlock()">
+  <div class="ring-container" *ngIf="ringingViewBoolean && !unlocking && !dice" (click)="showDice()">
     <md-chip-list>
       <md-chip class="msgChip" (click)="logOut()">Click to Unlock</md-chip>
     </md-chip-list>
@@ -271,7 +271,6 @@
   </div>
 
   <div class="ytOverlap">
-
   <youtube-player
       [videoId]="ytId"
       (ready)="savePlayer($event)"
@@ -279,7 +278,11 @@
       width='480' height='270' *ngIf="showYtVideo"></youtube-player>
   </div>
 
-  <md-spinner *ngIf="unlocking && (!this.cameraComponent || !this.cameraComponent.launched) "></md-spinner>
+  <dice *ngIf="dice"></dice>
+
+  <!-- <md-spinner *ngIf="launched && progress"></md-spinner> -->
+
+  <md-spinner *ngIf="unlocking && progress "></md-spinner>
 
   <div class="feed">
     <md-card class="example-card" *ngIf="toFeedBoolean">

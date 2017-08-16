@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { FileUploader } from 'ng2-file-upload';
 import { YoutubeSearchComponent } from './youtube-search/youtube-search.component';
 import { MdDialog, MdDialogRef } from '@angular/material';
+import { DiceComponent } from './dice/dice.component';
 // import { AwsService } from '../../services/aws.service';
 
 
@@ -29,6 +30,7 @@ export class HomeComponent implements OnInit {
   @ViewChild(BackgroundComponent) background : BackgroundComponent;
   @ViewChild(MdSidenavContainer) navContainer: MdSidenavContainer;
   @ViewChild(YoutubeSearchComponent) youtubeDialog: YoutubeSearchComponent;
+  @ViewChild(DiceComponent) diceComponent: DiceComponent;
 
   // input initializing
   nameInput: string;
@@ -53,7 +55,7 @@ export class HomeComponent implements OnInit {
   firstDetected: boolean = false; //first detection
   faceCompleted: boolean = false; //oneFace found
   continueDetect: any; //variable to assign setInterval function
-  photoUrlSaved:boolean = false;//has Base64saved?
+  faceCompletionConfirmed:boolean = false;//has Base64saved?
   photoUrl: string = ''; //in case of aws
   base64: string = '';
   proceedToSignUpBoolean: boolean =false;
@@ -163,9 +165,9 @@ export class HomeComponent implements OnInit {
 
   ngDoCheck() {
 
-    if(this.launched && !this.cameraComponent){
-      this.showMesseges();
-    }
+    // if(this.launched && !this.cameraComponent){
+    //   // this.showMesseges();
+    // }
 
     if(!this.cameraTurnedOnFromChild && //Check if camera is turned on for the first time
        this.cameraComponent &&          //make sure the cameraCom is not undefined
@@ -174,16 +176,26 @@ export class HomeComponent implements OnInit {
       this.cameraTurnedOnFromChild = true;
       setTimeout(()=>{
         this.progress = false;
-        $('.firstLine').html('Camera ready. Looking for your face...');
+        if(!this.expressionTask){
+          $('.firstLine').html('Camera ready. Looking for your face...');
+        }
+        else{
+          this.instructExpress();
+        }
       },1400);
       setTimeout(()=>{
-          this.cameraComponent.visionDetect().then(res=>this.firstDetected = true).then(res => this.isDetectionDone = true);
-      },4000);
+          this.cameraComponent.visionDetect()
+          .then(res=>{
+            this.firstDetected = true
+            this.base64= this.cameraComponent.base64;
+          })
+          .then(res => this.isDetectionDone = true);
+      },3500);
     } //First visionDetect done
 
     if(this.firstDetected && !this.faceCompleted && this.cameraComponent.detected && this.isDetectionDone ){
       console.log("condition running..");
-      let continueIt = true;
+      let continueIt = false;
       this.isDetectionDone = false;
 
       if(!this.cameraComponent.faceAnno){
@@ -194,62 +206,118 @@ export class HomeComponent implements OnInit {
           str = str + `<b>${this.cameraComponent.labelAnno[2].description}</b>? `;
         }
         str = str + `Now, try again.`;
+        str = this.expressionTask ? str + ` ${this.expressionSubString}!` : str;
+
         $('.secondLine').html(str);
         $('.secondLine').removeClass('_hidden');
+        continueIt = true;
       }
       else if(this.cameraComponent.faceCount!==1){
         $('.firstLine').html(`I see more than one face.
                               <b>${this.cameraComponent.faceCount}</b> faces?`);
-        $('.secondLine').html(`Just show your face. Now, try again`);
+        let str = `Just show your face. Now, try again.`;
+        str = this.expressionTask ? str + ` ${this.expressionSubString}!` : str;
+        $('.secondLine').html(str);
         $('.secondLine').removeClass('_hidden');
+        continueIt = true;
       }
       else if(
-        this.cameraComponent.faceAnno[0].headwearLikelihood === 'VERY_LIKELY'){
-          $('.firstLine').html(`Take off your hat please. Now, try again`);
+        this.cameraComponent.faceAnno[0].headwearLikelihood === 'VERY_LIKELY' ||
+        this.cameraComponent.faceAnno[0].headwearLikelihood === 'LIKELY'){
+          let str = `Take off your hat please. Now, try again.`;
+          str = this.expressionTask ? str + ` ${this.expressionSubString}!` : str;
+          $('.firstLine').html(str);
           $('.secondLine').addClass('_hidden');
+          continueIt = true;
       }
       else if(
         this.cameraComponent.faceAnno[0].joyLikelihood === 'VERY_LIKELY' ||
         this.cameraComponent.faceAnno[0].joyLikelihood === 'LIKELY'){
           $('.firstLine').html(`😊&nbspI like your smile! You seem <b>happy</b>.`);
-          $('.secondLine').addClass('_hidden');
-          this.faceCompleted = true;
-          clearTimeout(this.continueDetect);
-          continueIt = false;
+
+          //when signUp
+          if(!this.expressionTask){
+            $('.secondLine').addClass('_hidden');
+            this.faceCompleted = true;
+            clearTimeout(this.continueDetect);
+          }
+          //when unlocking & matched expression
+          else if(this.expressionTask === 'smile'){
+            this.expressionMatched();
+          }
+          else{
+            this.wrongExpression('smiling 😊');
+            continueIt = true;
+          }
       }
       else if(
         this.cameraComponent.faceAnno[0].angerLikelihood === 'VERY_LIKELY' ||
-        this.cameraComponent.faceAnno[0].angerLikelihood === 'LIKELY'){
+        this.cameraComponent.faceAnno[0].angerLikelihood === 'LIKELY' ||
+        this.cameraComponent.faceAnno[0].angerLikelihood === 'POSSIBLE'){
           $('.firstLine').html(`😡&nbspYou seem <b>upset</b>. Eat a cookie.🍪`);
-          $('.secondLine').addClass('_hidden');
-          this.faceCompleted = true;
-          clearTimeout(this.continueDetect);
-          continueIt = false;
+
+          if(!this.expressionTask){
+            $('.secondLine').addClass('_hidden');
+            this.faceCompleted = true;
+            clearTimeout(this.continueDetect);
+          }
+          else if(this.expressionTask === 'anger'){
+            this.expressionMatched();
+          }
+          else{
+            this.wrongExpression('making angry face 😡');
+            continueIt = true;
+          }
       }
       else if(
         this.cameraComponent.faceAnno[0].sorrowLikelihood === 'VERY_LIKELY' ||
         this.cameraComponent.faceAnno[0].sorrowLikelihood === 'LIKELY'){
           $('.firstLine').html(`😔&nbspYou seem <b>sad</b>. What happened?`);
-          $('.secondLine').addClass('_hidden');
-          this.faceCompleted = true;
-          clearTimeout(this.continueDetect);
-          continueIt = false;
+
+          if(!this.expressionTask){
+            $('.secondLine').addClass('_hidden');
+            this.faceCompleted = true;
+            clearTimeout(this.continueDetect);
+          }
+          else if(this.expressionTask === 'sad'){
+            this.expressionMatched();
+          }
+          else{
+            this.wrongExpression('making sad face 😔');
+            continueIt = true;
+          }
+
       }
       else if(
         this.cameraComponent.faceAnno[0].surpriseLikelihood === 'VERY_LIKELY' ||
         this.cameraComponent.faceAnno[0].surpriseLikelihood === 'LIKELY'){
           $('.firstLine').html(`😮&nbspAre you <b>surprised</b>?`);
-          $('.secondLine').addClass('_hidden');
-          this.faceCompleted = true;
-          clearTimeout(this.continueDetect);
-          continueIt = false;
+
+          if(!this.expressionTask){
+            $('.secondLine').addClass('_hidden');
+            this.faceCompleted = true;
+            clearTimeout(this.continueDetect);
+          }
+          else if(this.expressionTask === 'surprised'){
+            this.expressionMatched();
+          }
+          else{
+            this.wrongExpression('making surprised face 😮');
+            continueIt = true;
+          }
       }
       else{
-          $('.firstLine').html(`😑&nbspI can't tell your emotion. But Whatever.`);
-          $('.secondLine').addClass('_hidden');
-          this.faceCompleted = true;
-          clearTimeout(this.continueDetect);
-          continueIt = false;
+          if(!this.expressionTask){
+            $('.firstLine').html(`😑&nbspI can't tell your emotion. But Whatever.`);
+            $('.secondLine').addClass('_hidden');
+            this.faceCompleted = true;
+            clearTimeout(this.continueDetect);
+          }
+          else{
+            $('.firstLine').html(`😑&nbspI can't tell your emotion.`);
+            $('.secondLine').html(`Please ${this.expressionSubString}!`).removeClass('_hidden');
+            continueIt = true;
+          }
       }
 
       if(continueIt){  //Continue if face was not detected
@@ -258,16 +326,16 @@ export class HomeComponent implements OnInit {
 
     }
 
-    if(this.faceCompleted && !this.photoUrlSaved){
-      this.base64= this.cameraComponent.base64;
+    if(this.faceCompleted && !this.faceCompletionConfirmed){
+      this.faceCompletionConfirmed = true;
       this.cameraComponent.captureIt();
       clearTimeout(this.continueDetect);
-      $('.buttonCol').removeClass('_hidden');
       console.log("yep! Face detected!");
-      this.photoUrlSaved = true;
+      $('.buttonCol').removeClass('_hidden');
       $('.okButton').click(()=>{
         this.proceedToSignUp();
         this.cameraComponent.minimizeIt();
+        this.cameraComponent.clearCanvas();
       });
     }
 
@@ -301,21 +369,36 @@ export class HomeComponent implements OnInit {
         this.searchDialog.updateSize('height', 'auto');
       }
     }
+
+    if(this.diceComponent && this.diceComponent.rolling && !this.diceComponent.clickOff){
+      this.roll();
+      this.diceComponent.hideIntro();
+      this.diceComponent.turnOffClick();
+    }
+
+    if(this.diceComponent && this.diceComponent.emoji && !this.diceComponent.rolling){
+      this.setUpExpression(this.diceComponent.emoji);
+      this.diceComponent.emoji = '';
+    }
+
   }//end of ngDoCheck
 
 
 
   continueDetecting(){
     return setTimeout(()=>{
+      this.cameraComponent.clearCanvas();
       this.cameraComponent.visionDetect().then(()=>{
         this.isDetectionDone = true;
+        this.base64= this.cameraComponent.base64;
       });
-    }, 3000);
+    }, 2500);
   }
 
   readyClick(){
     this.launched = true;
     this.cameraOn = true;
+    this.showMesseges();
   }
 
   showMesseges(){
@@ -367,7 +450,20 @@ export class HomeComponent implements OnInit {
         // this.router.navigate(['/home']);
         this.loggedIn = true; // to view logged in views
         this.currentUser = resultFromApi;
-        this.cameraComponent.hideCapture(); // to hide captured img
+        // this.cameraComponent.hideCapture(); // to hide captured img
+
+        this.cameraOn = false;
+        this.cameraComponent = undefined;
+        this.snackBar.dismiss();
+        this.cameraTurnedOnFromChild = false;
+        this.isDetectionDone = false;
+        this.firstDetected = false;
+        this.faceCompleted = false;
+        this.proceedToSignUpBoolean = false;
+        this.faceCompletionConfirmed = false;
+        this.launched = false;
+        this.progress = true;
+
     })
     .catch((err) => {
         const parsedError = err.json();
@@ -636,33 +732,87 @@ export class HomeComponent implements OnInit {
     },2000);
   }
   unlocking: boolean = false;
-  unlockdetectStarted: boolean = true;
-  continueTimer: any;
-  continueBoolean: boolean = false
+  dice: boolean = false;
+  expressionTask: string = '';
+  expressionSubString: string = '';
+
+  showDice(){
+    this.dice = true;
+    this.showMesseges();
+    $('.firstLine').html('Click and Roll The Dice');
+    $('.secondLine').html('To determine the face for you to make to turn the alarm off.');
+    $('.secondLine').removeClass('_hidden');
+  }
+
+  roll(){
+    $('.secondLine').addClass('_hidden');
+    $('.firstLine').html('🎲🎲🎲🎲🎲  Rolling...  🎲🎲🎲🎲🎲');
+  }
+
+  setUpExpression( emoji:string ){
+    if(emoji === 'joy'){
+      this.expressionTask = 'smile';
+      this.expressionSubString = '<strong>Smile</strong> 😄';
+    }
+    else if (emoji === 'sad'){
+      this.expressionTask = 'sad';
+      this.expressionSubString = 'Make <strong>Sad Face</strong> 😔';
+    }
+    else{
+      this.expressionTask = 'surprised';
+      this.expressionSubString = 'Make <strong>Surprised Face</strong> 😲';
+    }
+    $('snack-bar-container').css('max-width', 'none').css('min-width', 'none');
+    $('.firstLine').html(`Looks Like You Must
+      ${this.expressionSubString} To Turn Alarm Off!`);
+    $('.secondLine').html('Are you ready?').removeClass('_hidden');
+
+    $('.buttonCol').removeClass('_hidden');
+    $('.okButton > .mat-button-wrapper').html('YES!');
+    $('.okButton').off('click').click(()=>{
+      this.proceedToUnlock();
+      this.dice = false;
+    });
+  }
 
   proceedToUnlock(){
     this.unlocking = true;
     this.cameraOn = true;
-    this.showMesseges();
-    console.log(this.unlocking);
-    console.log(this.cameraOn);
-    // this.cameraComponent.reopenCamera();
-    // this.launched = true
-    // $('.firstLine').html("Open your eyes and mouth wide 😲");
-    // setTimeout(()=>{
-    //   this.cameraComponent.visionDetect()
-    //   .then( res => {
-    //     this.unlockdetectStarted = true;
-    //
-    //   })
-    // },3000);
+    this.launched = true;
+    $('.buttonCol').addClass('_hidden');
+    $('.okButton > .mat-button-wrapper').html('Ok!');
+    $('.firstLine').html('Preparing Camera... Please allow camera on this app');
+    $('.secondLine').html('').addClass('_hidden');
+  }
 
+  instructExpress(){
+    $('.firstLine').html(`Camera Ready. Please ${this.expressionSubString}!`);
+  }
+
+  wrongExpression( current: string ){
+    $('.firstLine').html(`you are ${current}. Now, try again`);
+    $('.secondLine').html(`Please ${this.expressionSubString}!`);
+    $('.secondLine').removeClass('_hidden');
+  }
+
+  expressionMatched(){
+    $('.secondLine').html(`Your face expression matched! Now, You can turn alarm off`);
+    $('.secondLine').removeClass('_hidden');
+    this.faceCompleted = true;
+    clearTimeout(this.continueDetect);
+    $('.okButton > .mat-button-wrapper').html('OFF!');
+    $('.buttonCol').addClass('remove');
+    $('.okButton').off('click').click(()=>{
+      this.unlock();
+    });
   }
 
   unlock(){
     this.userService.deleteAlarm
     (this.currentUser._id,this.alarmTimeToDisplay[0].timeSet)
     .then((res)=>{
+      this.expressionTask = '';
+      this.expressionSubString = '';
       this.refreshAlarm()
       .then((res)=>{
         if(!this.alarmTimeToDisplay[0]){
@@ -670,10 +820,21 @@ export class HomeComponent implements OnInit {
           this.set = undefined;
           console.log("there isn't more alarm! hasalarm: ", this.hasAlarm);
         }
+        this.unlocking = false;
+        this.cameraOn = false;
+        this.cameraComponent = undefined;
         this.background.switchBackground();
         this.ringingViewBoolean = false;
         this.showYtVideo = false;
         this.ytVideoPlayed = false;
+        this.cameraTurnedOnFromChild = false;
+        this.isDetectionDone = false;
+        this.firstDetected = false;
+        this.faceCompleted = false;
+        this.faceCompletionConfirmed = false;
+        this.launched = false;
+        this.progress = true;
+        this.snackBar.dismiss();
         $('.ytOverlap').removeClass('removeAllEvents');
 
       })

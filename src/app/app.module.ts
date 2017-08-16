@@ -34,6 +34,7 @@ import { FaceService } from './services/face.service';
 import { UserService } from './services/user.service';
 import { YoutubeService } from './services/youtube.service';
 import { YoutubeSearchComponent } from './pages/home/youtube-search/youtube-search.component';
+import { DiceComponent } from './pages/home/dice/dice.component';
 // import { AwsService } from './services/aws.service';
 
 @NgModule({
@@ -47,6 +48,7 @@ import { YoutubeSearchComponent } from './pages/home/youtube-search/youtube-sear
     BackgroundComponent,
     MsgSnackComponent,
     YoutubeSearchComponent,
+    DiceComponent,
   ],
   imports: [
     BrowserModule,

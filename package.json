@@ -24,6 +24,7 @@
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/router": "^4.0.0",
     "@types/youtube": "0.0.30",
+    "async-foreach": "^0.1.3",
     "aws-sdk": "^2.88.0",
     "core-js": "^2.4.1",
     "extract-text-webpack-plugin": "^2.1.2",
