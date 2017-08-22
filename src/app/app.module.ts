@@ -29,13 +29,13 @@ import { WebCamComponent } from 'ack-angular-webcam';
 import { CameraComponent } from './camera/camera.component';
 import { BackgroundComponent } from './background/background.component';
 import { MsgSnackComponent } from './pages/home/msg-snack/msg-snack.component';
+import { YoutubeSearchComponent } from './pages/home/youtube-search/youtube-search.component';
+import { DiceComponent } from './pages/home/dice/dice.component';
 
 import { FaceService } from './services/face.service';
 import { UserService } from './services/user.service';
 import { YoutubeService } from './services/youtube.service';
-import { YoutubeSearchComponent } from './pages/home/youtube-search/youtube-search.component';
-import { DiceComponent } from './pages/home/dice/dice.component';
-// import { AwsService } from './services/aws.service';
+import { PostService } from './services/post.service';
 
 @NgModule({
   declarations: [
@@ -78,8 +78,8 @@ import { DiceComponent } from './pages/home/dice/dice.component';
   ],
   providers: [FaceService,
               UserService,
-              YoutubeService
-              // AwsService
+              YoutubeService,
+              PostService
             ],
   bootstrap: [AppComponent],
   entryComponents: [DialogComponent,

@@ -1,7 +1,7 @@
 @import "~assets/colors.scss";
 
 .alarmList{
-  position: absolute;
+  position: fixed;
   z-index: 4;
   width: 240px;
   top: 15%;
@@ -87,26 +87,20 @@ md-spinner{
 .feed{
   width: 35%;
   margin: auto;
+  position: relative;
+  z-index: 5;
 
-  i{
-    margin-bottom: 20px;
-    margin-top: 10px;
-    color: $pink400;
-  }
   md-card{
     margin-top: 20px;
+    font-size: 1.2em;
+  }
+  .example-header-image{
+    background-size: cover;
+    background-position: center;
   }
 
-  .example-header-image.deokjae {
-    background-image: url('https://scontent-mia3-1.xx.fbcdn.net/v/t31.0-8/18423154_1336382713113753_4059164658223049507_o.jpg?oh=14ea7ce4185bd102e1dfcb9c8e931fb4&oe=5A33D6C1');
-    background-size: cover;
-  }
-  .example-header-image.anth {
-    background-image: url('https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAA3QAAAAJGNkZGZjZjJiLTM0NzMtNGU4YS05MDBhLTIwZWViMTg2YWRkOQ.jpg');
-    background-size: cover;
-  }
   p{
-    line-height: 1.2em;
+    line-height: 1.3em;
   }
 }
 

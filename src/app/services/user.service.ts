@@ -14,7 +14,7 @@ export class UserService {
 
   //signs up and logs in
   // an argument for each "req.body" in the API route
-  signup(name, password, file) {
+  signup(name, password, photoUrl) {
       return this.http
         .post(
           // 'http://localhost:3000/api/signup',
@@ -24,7 +24,7 @@ export class UserService {
           {
             name: name,
             password: password,
-            file: file  //req.file on auth.js on server
+            photoUrl: photoUrl
           },
 
           // Send the cookies across domains

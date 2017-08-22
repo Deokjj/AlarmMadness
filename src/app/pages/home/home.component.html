@@ -129,6 +129,10 @@
         <i class="material-icons">alarm</i>
         <span>Alarm</span>
       </button>
+      <!-- <button md-button>&nbsp;
+        <img [src]="currentUser.photoUrl">
+        Profile
+      </button> -->
       <button md-button (click)="viewFeed()">&nbsp;
         <i class="material-icons">face</i>
         Feed
@@ -159,7 +163,8 @@
     <md-chip-list class="mat-chip-list-stacked">
       <md-chip *ngFor="let alarm of alarmTimeToDisplay ; let i = index" [ngClass]="{'soonAlarm': 0 == i}">
         <span>
-          {{alarm.timeSet.slice(16,27)}}
+          <!-- {{alarm.timeSet.slice(16,27)}} -->
+          {{humanize(alarm.timeSet)}}
         </span>
         <i class="material-icons" (click)="deleteAlarm(i)">close</i>
       </md-chip>
@@ -284,73 +289,63 @@
 
   <md-spinner *ngIf="unlocking && progress "></md-spinner>
 
-  <div class="feed">
-    <md-card class="example-card" *ngIf="toFeedBoolean">
+  <div class="feed" *ngIf="toFeedBoolean">
+    <!-- <md-card>
+      <img md-card-image [src]="currentUser.photoUrl">
       <md-card-header>
-        <div md-card-avatar class="example-header-image deokjae"></div>
-        <md-card-title>Deokjae</md-card-title>
-        <md-card-subtitle>Annoyed</md-card-subtitle>
+        <div md-card-avatar class="example-header-image" [ngStyle]="{'background-image': 'url(' + currentUser.photoUrl + ')'}"></div>
+        <md-card-title>{{currentUser.name}}</md-card-title>
+        <md-card-subtitle></md-card-subtitle>
       </md-card-header>
-      <img md-card-image src="https://scontent-mia3-1.xx.fbcdn.net/v/t31.0-8/18423154_1336382713113753_4059164658223049507_o.jpg?oh=14ea7ce4185bd102e1dfcb9c8e931fb4&oe=5A33D6C1">
-      <md-card-content>
-        <p>
-          I woke up like this.
-        </p>
-      </md-card-content>
-      <md-card-actions>
-        <button md-button><i class="material-icons">sentiment_neutral</i></button>
-      </md-card-actions>
-    </md-card>
+    </md-card> -->
 
-    <md-card class="example-card" *ngIf="toFeedBoolean">
+    <!-- let alarm of alarmTimeToDisplay ; let i = index -->
+    <md-card *ngFor="let post of posts ; let i = index">
+      <img md-card-image [src]="post.photoUrl">
       <md-card-header>
-        <div md-card-avatar class="example-header-image anth"></div>
-        <md-card-title>Anthony</md-card-title>
-        <md-card-subtitle>Yeah Dude</md-card-subtitle>
+        <md-card-title>{{post.userName}} {{post.emoji}}</md-card-title>
+        <!-- post made when signed up -->
+        <md-card-subtitle *ngIf="!post.timeSet">Signed up at <strong>{{post.createdAt}}</strong></md-card-subtitle>
+        <!-- post made when unlocking -->
+        <md-card-subtitle *ngIf="post.timeSet">
+          Unlocked at <strong>{{post.createdAt}}</strong>
+          <br>
+          <i class="material-icons">music_note</i> {{post.soundSet.title}}
+        </md-card-subtitle>
       </md-card-header>
-      <img md-card-image src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAA3QAAAAJGNkZGZjZjJiLTM0NzMtNGU4YS05MDBhLTIwZWViMTg2YWRkOQ.jpg">
-      <md-card-content>
+      <md-card-content *ngIf="!post.timeSet">
         <p>
-          Yeah Dude. I was born in Africa. I am MBA at UM. I love bit coins. I speak french with Danny. Danny has a big nose. Danny is a friend of Tommy. Tommy loves training. So is Ariel.
+         {{post.userName}} just joined!
+        </p>
+      </md-card-content>
+      <md-card-content *ngIf="post.timeSet">
+        <p>
+          Alarm was set for <strong>{{post.timeSetHuman}}</strong>.
+          <br>
+          Duration :
+          <strong>
+            <span *ngIf="post.duration.h !== 0">{{post.duration.h}} hr </span>
+            <span *ngIf="post.duration.m !== 0">{{post.duration.m}} min </span>
+            {{post.duration.s}} sec</strong>
+          <br>
+          Time took to set off :
+          <strong>
+            <span *ngIf="post.timeTook.h !== 0">{{post.timeTook.h}} hr </span>
+            <span *ngIf="post.timeTook.m !== 0">{{post.timeTook.m}} min </span>
+            {{post.timeTook.s}} sec</strong>
         </p>
       </md-card-content>
       <md-card-actions>
-        <button md-button><i class="material-icons">mood</i></button>
+        <button md-button (click)="commentBtn(i)"><i class="material-icons">comment</i> COMMENT</button>
+        <!-- <button md-button><i class="material-icons">share</i> SHARE</button> -->
+        <button md-button *ngIf="currentUser._id === post.userId" (click)="deletePostBtn(i)">
+          <i class="material-icons">delete</i> DELETE</button>
       </md-card-actions>
-    </md-card>
-
-    <md-card class="example-card" *ngIf="toFeedBoolean">
-      <md-card-header>
-        <div md-card-avatar class="example-header-image deokjae"></div>
-        <md-card-title>Deokjae</md-card-title>
-        <md-card-subtitle>Annoyed</md-card-subtitle>
-      </md-card-header>
-      <img md-card-image src="https://scontent-mia3-1.xx.fbcdn.net/v/t31.0-8/18423154_1336382713113753_4059164658223049507_o.jpg?oh=14ea7ce4185bd102e1dfcb9c8e931fb4&oe=5A33D6C1">
-      <md-card-content>
-        <p>
-          I woke up like this.
-        </p>
-      </md-card-content>
-      <md-card-actions>
-        <button md-button><i class="material-icons">sentiment_neutral</i></button>
-      </md-card-actions>
-    </md-card>
-
-    <md-card class="example-card" *ngIf="toFeedBoolean">
-      <md-card-header>
-        <div md-card-avatar class="example-header-image anth"></div>
-        <md-card-title>Anthony</md-card-title>
-        <md-card-subtitle>Yeah Dude</md-card-subtitle>
-      </md-card-header>
-      <img md-card-image src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAA3QAAAAJGNkZGZjZjJiLTM0NzMtNGU4YS05MDBhLTIwZWViMTg2YWRkOQ.jpg">
-      <md-card-content>
-        <p>
-          Yeah Dude. I was born in Africa. I am MBA at UM. I love bit coins. I speak french with Danny. Danny has a big nose. Danny is a friend of Tommy. Tommy loves training. So is Ariel.
-        </p>
-      </md-card-content>
-      <md-card-actions>
-        <button md-button><i class="material-icons">mood</i></button>
-      </md-card-actions>
+      <div class="comments" *ngIf="post.commentEnabled">
+        <md-input-container>
+          <input mdInput required focused placeholder="Comment">
+        </md-input-container>
+      </div>
     </md-card>
   </div>
 

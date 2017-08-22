@@ -1,7 +1,8 @@
 import { Component, ViewChild, AfterViewInit} from '@angular/core';
 import { Http, Request } from '@angular/http';
 import { FaceService } from '../services/face.service';
-// import 'aws-sdk/dist/aws-sdk';
+import * as AWS from 'aws-sdk';
+import { environment } from '../../environments/environment';
 
 
 
@@ -25,6 +26,8 @@ export class CameraComponent implements AfterViewInit{
   finalPhoto: boolean = false;
   cameraOn: boolean = true;
 
+  s3: any;
+
   @ViewChild("canvas") canvas;
   context:CanvasRenderingContext2D;
   actualToClientSizeConverse: number;
@@ -33,6 +36,16 @@ export class CameraComponent implements AfterViewInit{
 
   constructor(public http:Http,
               private faceService: FaceService) {
+
+    AWS.config.update({
+      region:'us-east-2',
+      credentials: new AWS.Credentials(environment.AWS_ACCESS_KEY_ID,environment.AWS_SECRET_ACCESS_KEY)
+    })
+    this.s3 = new AWS.S3({
+      apiVersion: '2006-03-01',
+      params: {Bucket: 'alarmmadness'}
+    });
+
   }
 
   ngAfterViewInit() {
@@ -84,32 +97,34 @@ export class CameraComponent implements AfterViewInit{
 
 
   //get HTML5 FormData object and pretend to post to server
-  genPostData(){
-    this.webcam.captureAsFormData({fileName:'file.jpg'})
-    // .then( formData=>this.postFormData(formData) )
-    .then( formData => console.log("data from webcam capture", formData))
-    .catch( e=>console.error(e) )
-    // this.genBase64();
+  // genFormData(){
+  //   return this.webcam.captureAsFormData({fileName:'file.jpg'})
+  //   // .then( formData=>this.postFormData(formData) )
+  //   .then( formData => console.log("data from webcam capture", formData))
+  //   .catch( e=>console.error(e) )
+  //   // this.genBase64();
+  // }
+  //
+  // //a pretend process that would post the webcam photo taken
+  // postFormData(formData){
+  //   const config = {
+  //     method:"post",
+  //     url:"http://www.aviorsciences.com/",
+  //     body: formData
+  //   }
+  //   // console.log("formData (which is body of POST form) passed when captured is : ");
+  //   // console.log(config.body);
+  //   const request = new Request(config);
+  //   // console.log("request with config param is: ")
+  //   // console.log(request);
+  //
+  //   return this.http.request( request );
+  //
+  // }
+
+  onCamError(err){
+    console.log('onCamError: ', err);
   }
-
-  //a pretend process that would post the webcam photo taken
-  postFormData(formData){
-    const config = {
-      method:"post",
-      url:"http://www.aviorsciences.com/",
-      body: formData
-    }
-    // console.log("formData (which is body of POST form) passed when captured is : ");
-    // console.log(config.body);
-    const request = new Request(config);
-    // console.log("request with config param is: ")
-    // console.log(request);
-
-    return this.http.request( request );
-
-  }
-
-  onCamError(err){}
 
   onCamSuccess(whatever){
     this.webcam.options = {
@@ -182,37 +197,31 @@ export class CameraComponent implements AfterViewInit{
       this.base64 = '';
   }
 
+  uploadPostData( fileName:string ){
+    let buf = new Buffer(this.base64.replace(/^data:image\/\w+;base64,/, ""),'base64')
+    if(this.base64){
+      let params = {
+        // Bucket: 'alarmmadness',
+        Key: fileName +'.jpg',
+        Body: buf,
+        ContentEncoding: 'base64',
+        ContentType: 'image/jpeg',
+        ACL: 'public-read'
+      };
 
-  fileEvent(fileInput:any){
-    let AWS = (<any>window).AWS;
-    let file = fileInput.target.files[0];
-    // AWS.config.accessKeyId = "";
-    // AWS.config.secretAccessKey = "";
-    // AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId:''});
-    AWS.config.region = "us-east-2";
-    AWS.config.credentials =  new AWS.Credentials('', '', null );
-    // AWS.config.credentials = new AWS.CognitoIdentityCredentials(
-    //   {
-    //     // accessKeyId : "",
-    //     // secretAccessKey : ""
-    //   },
-    //   {
-    //     region: 'us-east-2'
-    //   }
-    // );
-    // { "accessKeyId": "", "secretAccessKey": "", "region": "us-east-1" }
-    // AWS.config.loadFromPath('~awsconfig.json');
-    // console.log(AWS.CognitoIdentityCredentials);
+      this.s3.upload(params,function(err,res){
+        console.log('File Upload Error: ',err);
+        console.log('File Upload Response: ',res);
+        //url : https://alarmmadness.s3.us-east-2.amazonaws.com/{key}
+        //res.key returns {key} above ⬆
+        //res.location returns full url
+        return res.key;
+      });
 
-    console.log("config: ");
-    console.log(AWS.config);
-    // let bucket = new AWS.S3({params: {Bucket: "alarmmadness"}});
-    let s3 = new AWS.S3();
-    let params = {Bucket: 'alarmmadness', Key: file.name, Body:file};
-    s3.upload(params,function(err,res){
-      console.log('error',err);
-      console.log('response',res);
-    })
+    }
+    else{
+      console.log('this.base64 is undefined: ', this.base64);
+    }
   }
 
 }

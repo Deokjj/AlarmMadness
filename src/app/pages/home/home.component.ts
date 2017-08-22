@@ -8,13 +8,12 @@ import { MdSnackBar, MdSidenavContainer } from '@angular/material';
 import { MsgSnackComponent } from './msg-snack/msg-snack.component';
 import { FormControl, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
+import { PostService } from '../../services/post.service';
 import { Router } from '@angular/router';
 import { FileUploader } from 'ng2-file-upload';
 import { YoutubeSearchComponent } from './youtube-search/youtube-search.component';
 import { MdDialog, MdDialogRef } from '@angular/material';
 import { DiceComponent } from './dice/dice.component';
-// import { AwsService } from '../../services/aws.service';
-
 
 const NAME_REGEX = /^([ \u00c0-\u01ffa-zA-Z'\-])+$/;
 const NUMBERONLY = /^\d+$/;
@@ -35,6 +34,7 @@ export class HomeComponent implements OnInit {
   // input initializing
   nameInput: string;
   passwordInput : string;
+  emoji: string;
   //
 
   // Page view conditions
@@ -56,8 +56,6 @@ export class HomeComponent implements OnInit {
   faceCompleted: boolean = false; //oneFace found
   continueDetect: any; //variable to assign setInterval function
   faceCompletionConfirmed:boolean = false;//has Base64saved?
-  photoUrl: string = ''; //in case of aws
-  base64: string = '';
   proceedToSignUpBoolean: boolean =false;
   errorMsg: string = '';
 
@@ -66,9 +64,8 @@ export class HomeComponent implements OnInit {
   uploader = new FileUploader({
     url: 'http://localhost:3000/api/signup'
   });
-  // testBoolean: boolean = true;
 
-  // now: number = Date.now();
+
   now: number;
 
   //Alarm Form
@@ -83,6 +80,7 @@ export class HomeComponent implements OnInit {
   hasAlarm: boolean = false;
   set: any;
   alarmTimeToDisplay =[];
+  posts =[];
 
 
   nameFormControl = new FormControl('', [
@@ -132,8 +130,7 @@ export class HomeComponent implements OnInit {
   constructor(
     public snackBar: MdSnackBar,
     private userService: UserService,
-    // private awsService: AwsService,
-    // private youtubeService: YoutubeService,
+    private postService: PostService,
     private router: Router,
     public dialog: MdDialog) {
     if(!this.currentUser){
@@ -149,25 +146,25 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.userService.checklogin()
     .then((currentUserFromApi) => {
+      console.log('🍪 Checked: logged In - User: ', currentUserFromApi);
       this.currentUser = currentUserFromApi;
       this.loggedIn=true;
-    })
 
-    this.refreshAlarm()
-    .then((res)=>{
-      console.log('page refreshed.');
-      console.log('alarmTimeToDisplay: ', this.alarmTimeToDisplay);
-      console.log('hasAlarm: ', this.hasAlarm);
-      console.log('this.set: ', this.set);
+      this.refreshAlarm()
+      .then((res)=>{
+        console.log('page refreshed.');
+        console.log('alarmTimeToDisplay: ', this.alarmTimeToDisplay);
+        console.log('hasAlarm: ', this.hasAlarm);
+        console.log('this.set: ', this.set);
+      });
+    })
+    .catch((err)=>{
+      console.log(err._body);
     });
 
   }
 
   ngDoCheck() {
-
-    // if(this.launched && !this.cameraComponent){
-    //   // this.showMesseges();
-    // }
 
     if(!this.cameraTurnedOnFromChild && //Check if camera is turned on for the first time
        this.cameraComponent &&          //make sure the cameraCom is not undefined
@@ -186,8 +183,7 @@ export class HomeComponent implements OnInit {
       setTimeout(()=>{
           this.cameraComponent.visionDetect()
           .then(res=>{
-            this.firstDetected = true
-            this.base64= this.cameraComponent.base64;
+            this.firstDetected = true;
           })
           .then(res => this.isDetectionDone = true);
       },3500);
@@ -223,7 +219,8 @@ export class HomeComponent implements OnInit {
       }
       else if(
         this.cameraComponent.faceAnno[0].headwearLikelihood === 'VERY_LIKELY' ||
-        this.cameraComponent.faceAnno[0].headwearLikelihood === 'LIKELY'){
+        this.cameraComponent.faceAnno[0].headwearLikelihood === 'LIKELY' ||
+        this.cameraComponent.faceAnno[0].headwearLikelihood === 'POSSIBLE'){
           let str = `Take off your hat please. Now, try again.`;
           str = this.expressionTask ? str + ` ${this.expressionSubString}!` : str;
           $('.firstLine').html(str);
@@ -234,7 +231,7 @@ export class HomeComponent implements OnInit {
         this.cameraComponent.faceAnno[0].joyLikelihood === 'VERY_LIKELY' ||
         this.cameraComponent.faceAnno[0].joyLikelihood === 'LIKELY'){
           $('.firstLine').html(`😊&nbspI like your smile! You seem <b>happy</b>.`);
-
+          this.emoji = '😊';
           //when signUp
           if(!this.expressionTask){
             $('.secondLine').addClass('_hidden');
@@ -255,6 +252,7 @@ export class HomeComponent implements OnInit {
         this.cameraComponent.faceAnno[0].angerLikelihood === 'LIKELY' ||
         this.cameraComponent.faceAnno[0].angerLikelihood === 'POSSIBLE'){
           $('.firstLine').html(`😡&nbspYou seem <b>upset</b>. Eat a cookie.🍪`);
+          this.emoji = '😡';
 
           if(!this.expressionTask){
             $('.secondLine').addClass('_hidden');
@@ -273,6 +271,7 @@ export class HomeComponent implements OnInit {
         this.cameraComponent.faceAnno[0].sorrowLikelihood === 'VERY_LIKELY' ||
         this.cameraComponent.faceAnno[0].sorrowLikelihood === 'LIKELY'){
           $('.firstLine').html(`😔&nbspYou seem <b>sad</b>. What happened?`);
+          this.emoji = '😔';
 
           if(!this.expressionTask){
             $('.secondLine').addClass('_hidden');
@@ -292,6 +291,7 @@ export class HomeComponent implements OnInit {
         this.cameraComponent.faceAnno[0].surpriseLikelihood === 'VERY_LIKELY' ||
         this.cameraComponent.faceAnno[0].surpriseLikelihood === 'LIKELY'){
           $('.firstLine').html(`😮&nbspAre you <b>surprised</b>?`);
+          this.emoji = '😮';
 
           if(!this.expressionTask){
             $('.secondLine').addClass('_hidden');
@@ -309,6 +309,8 @@ export class HomeComponent implements OnInit {
       else{
           if(!this.expressionTask){
             $('.firstLine').html(`😑&nbspI can't tell your emotion. But Whatever.`);
+            this.emoji = '😑';
+
             $('.secondLine').addClass('_hidden');
             this.faceCompleted = true;
             clearTimeout(this.continueDetect);
@@ -328,15 +330,20 @@ export class HomeComponent implements OnInit {
 
     if(this.faceCompleted && !this.faceCompletionConfirmed){
       this.faceCompletionConfirmed = true;
-      this.cameraComponent.captureIt();
       clearTimeout(this.continueDetect);
-      console.log("yep! Face detected!");
+      this.cameraComponent.captureIt();
       $('.buttonCol').removeClass('_hidden');
-      $('.okButton').click(()=>{
-        this.proceedToSignUp();
-        this.cameraComponent.minimizeIt();
-        this.cameraComponent.clearCanvas();
-      });
+      if(!this.expressionTask){
+        console.log("yep! Face detected!");
+        $('.okButton').click(()=>{
+          this.proceedToSignUp();
+          this.cameraComponent.minimizeIt();
+          this.cameraComponent.clearCanvas();
+        });
+      }
+      else{
+        console.log('face expression matched!');
+      }
     }
 
     if(this.loggedIn && this.toAlarmBoolean &&
@@ -390,7 +397,6 @@ export class HomeComponent implements OnInit {
       this.cameraComponent.clearCanvas();
       this.cameraComponent.visionDetect().then(()=>{
         this.isDetectionDone = true;
-        this.base64= this.cameraComponent.base64;
       });
     }, 2500);
   }
@@ -438,19 +444,29 @@ export class HomeComponent implements OnInit {
     ]);
   }
 
-  signUp(){
+  baseUrl:string = 'https://alarmmadness.s3.us-east-2.amazonaws.com/';
 
-    this.userService.signup(this.nameInput, this.passwordInput, undefined)
+  signUp(){
+    this.cameraComponent.uploadPostData('users/'+this.nameInput);
+
+    let photoUrl = this.baseUrl + 'users/' + this.nameInput + '.jpg';
+
+    this.userService.signup(this.nameInput, this.passwordInput, photoUrl)
     .then((resultFromApi) => {
         // clear form
         this.nameInput = "";
         this.passwordInput = "";
         this.errorMsg = "";
 
-        // this.router.navigate(['/home']);
         this.loggedIn = true; // to view logged in views
         this.currentUser = resultFromApi;
-        // this.cameraComponent.hideCapture(); // to hide captured img
+
+        this.postService.newPost({
+          userId: resultFromApi._id,
+          userName: resultFromApi.name,
+          emoji: this.emoji,
+          photoUrl: photoUrl
+        });
 
         this.cameraOn = false;
         this.cameraComponent = undefined;
@@ -520,10 +536,62 @@ export class HomeComponent implements OnInit {
     this.toAlarmBoolean = true;
     this.navContainer.close();
   }
+
+  refreshPost(res){
+    this.posts = res.reverse();
+    this.posts = this.posts.map((post)=>{
+      if(post.timeSet){
+        let timeSetMoment = moment(post.timeSet);
+        let alarmCreatedAtMoment = moment(post.alarmCreatedAt);
+        let createdAtMoment = moment(post.createdAt);
+
+        post.duration = {};
+        post.duration.h = timeSetMoment.diff(alarmCreatedAtMoment, 'hours');
+        post.duration.m = timeSetMoment.diff(alarmCreatedAtMoment, 'minutes');
+        post.duration.s = timeSetMoment.diff(alarmCreatedAtMoment, 'seconds');
+        post.timeTook = {};
+        post.timeTook.h = createdAtMoment.diff(timeSetMoment, 'hours');
+        post.timeTook.m = createdAtMoment.diff(timeSetMoment, 'minutes');
+        post.timeTook.s = createdAtMoment.diff(timeSetMoment, 'seconds');
+        if(post.soundSet.title.length>55){
+          post.soundSet.title = post.soundSet.title.slice(0,55) + '...';
+        }
+      }
+      post.createdAt = moment(post.createdAt).format('MMM D [at] h:m:sa, YYYY Z');
+      post.timeSetHuman = moment(post.timeSet).format('h:m:sa');
+      return post;
+    });
+  }
+
   viewFeed(){
-    this.toFeedBoolean = true;
-    this.toAlarmBoolean = false;
-    this.navContainer.close();
+    this.postService.loadAllPost()
+    .then((res)=>{
+      this.refreshPost(res);
+    })
+    .then((res)=>{
+      console.log(this.posts);
+      this.toFeedBoolean = true;
+      this.toAlarmBoolean = false;
+      this.navContainer.close();
+    });
+  }
+
+  commentBtn(i){
+    if(!this.posts[i].commentEnabled){
+      this.posts[i].commentEnabled = true;
+    }
+    else{
+      this.posts[i].commentEnabled = false;
+    }
+  }
+
+  deletePostBtn(i){
+    this.posts.splice(i,1);
+    this.postService.deletePost(this.posts[i]._id)
+    .then((res)=>{
+      console.log(res);
+      console.log(this.posts);
+    });
   }
 
   //method to toggle between alarm and timer
@@ -600,7 +668,8 @@ export class HomeComponent implements OnInit {
       } //the alarm Time set.
 
       this.userService.newAlarm
-      (this.currentUser._id,alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ'),moment().toString(),this.selectedAudio,this.title)
+      // alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ')
+      (this.currentUser._id,alarmSet.toISOString(),moment().toISOString(),this.selectedAudio,this.title)
       .then((res)=>{
           this.refreshAlarm()
           .then((res)=>{
@@ -616,7 +685,7 @@ export class HomeComponent implements OnInit {
                              .add(this.minsInput, 'minutes')
                              .add(this.secsInput, 'seconds');
       this.userService.newAlarm
-      (this.currentUser._id,alarmSet.format('ddd MMM DD Y hh:mm:ss A zZZ'),moment().toString(),this.selectedAudio,this.title)
+      (this.currentUser._id,alarmSet.toISOString(),moment().toISOString(),this.selectedAudio,this.title)
       .then((res)=>{
           this.refreshAlarm()
           .then((res)=>{
@@ -673,6 +742,10 @@ export class HomeComponent implements OnInit {
     .then((res)=>{
       if(this.alarmTimeToDisplay[0]){
         this.alarmTimeToDisplay = this.insertionSort(this.alarmTimeToDisplay);
+        // this.alarmTimeToDisplay.map((alarm)=>{
+        //   alarm.timeSet = moment(alarm.timeSet).format('MMM D [at] h:m:sa, YYYY Z');
+        //   return alarm;
+        // });
       }
     })///This working !! uncomment it
     .then((res)=>{
@@ -682,6 +755,9 @@ export class HomeComponent implements OnInit {
         this.hasAlarm = true;
       }
     });
+  }
+  humanize(timeString){
+    return moment(timeString).format('hh:mm:ss A');
   }
 
   deleteAlarm(alarmArrayIndex){
@@ -808,6 +884,23 @@ export class HomeComponent implements OnInit {
   }
 
   unlock(){
+    let soundSetTemp = this.alarmTimeToDisplay[0];
+    console.log(soundSetTemp);
+
+    let photoUrlKey= this.currentUser.name + moment().toISOString();
+    this.cameraComponent.uploadPostData('users/'+photoUrlKey);
+    let photoUrl = this.baseUrl + 'users/' + photoUrlKey + '.jpg';
+
+    this.postService.newPost({
+      userId: this.currentUser._id,
+      userName: this.currentUser.name,
+      emoji: this.emoji,
+      photoUrl: photoUrl,
+      soundSet: soundSetTemp.soundSet,
+      alarmCreatedAt:soundSetTemp.alarmCreatedAt,
+      timeSet:soundSetTemp.timeSet
+    });
+
     this.userService.deleteAlarm
     (this.currentUser._id,this.alarmTimeToDisplay[0].timeSet)
     .then((res)=>{
@@ -835,6 +928,7 @@ export class HomeComponent implements OnInit {
         this.launched = false;
         this.progress = true;
         this.snackBar.dismiss();
+        // this.cameraComponent.clearCanvas();
         $('.ytOverlap').removeClass('removeAllEvents');
 
       })

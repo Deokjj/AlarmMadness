@@ -37,9 +37,12 @@ export class MainComponent implements OnInit, OnDestroy {
   ngOnInit() {
     //check if logged in previous, then route to home page
     this.userService.checklogin()
-    .then((currentUserFromApi) => {
+    .then((res) => {
       this.router.navigate(['/home']);
-    } )
+    }).
+    catch((err)=>{
+      console.log(err._body);
+    });
 
     var clock = {
 
