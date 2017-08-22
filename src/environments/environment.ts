@@ -7,6 +7,6 @@ export const environment = {
   production: false,
   apiBase: 'http://localhost:3000',
   googleKey: 'AIzaSyAUz5OS7yIcPzYX0nHN3RC7FSbexR2iH3U',
-  AWS_ACCESS_KEY_ID:'AKIAJ4TQPOFSTWRGULFA',
-  AWS_SECRET_ACCESS_KEY:'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'
+  AWS_ACCESS_KEY_ID:'AKIAJWIHDY4MPCAPX3UQ',
+  AWS_SECRET_ACCESS_KEY:'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'
 };
