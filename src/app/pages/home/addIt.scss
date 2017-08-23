@@ -94,13 +94,59 @@ md-spinner{
     margin-top: 20px;
     font-size: 1.2em;
   }
+
   .example-header-image{
     background-size: cover;
     background-position: center;
+    border-radius: 0;
   }
 
   p{
     line-height: 1.3em;
+  }
+  md-input-container{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .mdInput{
+    margin: 0;
+    padding: 0;
+  }
+  .commentInput{
+    height: 40px;
+    position: relative;
+    transform: translateY(-20px);
+  }
+
+  .commentSection{
+    display:flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+  .commentContents{
+    margin-left: 10px;
+    width: 100%;
+    span{
+      display: block;
+      line-height: 18px;
+      strong{
+        font-weight: 400;
+      }
+    }
+    .commentInterface{
+      // margin-top: -2px;
+      color: $secondaryText;
+      height: 23px;
+      margin-bottom: 5px;
+      a{
+        height: 23px;
+        width: auto;
+        line-height: 23px;
+      }
+    }
   }
 }
 

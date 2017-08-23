@@ -585,9 +585,72 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  commentInput:string = '';
+
+  commentUpdate(event){
+    let str = event.target.value;
+    this.commentInput = str;
+  }
+
+  cleanUpCommentInput(event){
+    event.target.value = '';
+    console.log('event.target.value: ', event.target.value);
+  }
+  //i is index of posts
+  addComment(i){
+    if(this.commentInput){
+      console.log('adding comment - i: ' ,i);
+      let body = {
+        userId: this.currentUser._id,
+        userName: this.currentUser.name,
+        photoUrl: this.currentUser.photoUrl,
+        comment: this.commentInput,
+        postId: this.posts[i]._id,
+        _id: null,
+        createdAt: null
+      }
+      this.postService.addComment(body)
+        .then((res)=>{
+          body._id = res.commentInfo._id;
+          body.createdAt = res.commentInfo.createdAt;
+
+          this.posts[i].comments.push(body);
+        })
+      this.commentInput = '';
+
+    }
+  }
+
+  humanizeDate(dateStr){
+    return moment(dateStr).fromNow();
+  }
+
+  playYtFromPost(i){
+    // this.ytId = this.posts[i].soundSet.id;
+    // this.showYtVideo=true;
+  }
+
+  //i is index of posts
+  //j is index of comments of that particular post
+  deleteComment(i,j){
+    console.log('i is ', i);
+    console.log('j is ', j);
+
+    let body ={
+      postId: this.posts[i]._id,
+      commentId: this.posts[i].comments[j]._id
+    }
+    console.log('body: ', body);
+    this.postService.deleteComment(body)
+      .then((res)=>{
+        console.log(res);
+      })
+    this.posts[i].comments.splice(j,1);
+  }
+
   deletePostBtn(i){
-    this.posts.splice(i,1);
-    this.postService.deletePost(this.posts[i]._id)
+    let deletingPost = this.posts.splice(i,1)[0];
+    this.postService.deletePost(deletingPost._id)
     .then((res)=>{
       console.log(res);
       console.log(this.posts);
@@ -731,7 +794,9 @@ export class HomeComponent implements OnInit {
     }
 
     return items;
-}
+  }
+
+  ytIdTemp: string = '';
 
   refreshAlarm(){
     return this.userService.checklogin()
@@ -752,6 +817,7 @@ export class HomeComponent implements OnInit {
       if(this.alarmTimeToDisplay[0]){
         this.set = moment(this.alarmTimeToDisplay[0].timeSet);
         this.ytId = this.alarmTimeToDisplay[0].soundSet.id;
+        this.ytIdTemp = this.alarmTimeToDisplay[0].soundSet.id;
         this.hasAlarm = true;
       }
     });
@@ -799,6 +865,8 @@ export class HomeComponent implements OnInit {
   ringIt(){
     this.background.switchBackground();
     this.ringingViewBoolean = true;
+    console.log(this.set);
+    this.ytId = this.ytIdTemp;
     this.showYtVideo = true;
     this.set = undefined;
     $('.ytOverlap').addClass('removeAllEvents');

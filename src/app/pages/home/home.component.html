@@ -310,7 +310,7 @@
         <md-card-subtitle *ngIf="post.timeSet">
           Unlocked at <strong>{{post.createdAt}}</strong>
           <br>
-          <i class="material-icons">music_note</i> {{post.soundSet.title}}
+          <span (click) = 'playYtFromPost(i)'><i class="material-icons">music_note</i> {{post.soundSet.title}}</span>
         </md-card-subtitle>
       </md-card-header>
       <md-card-content *ngIf="!post.timeSet">
@@ -335,18 +335,32 @@
             {{post.timeTook.s}} sec</strong>
         </p>
       </md-card-content>
+      <md-card-content>
+        <div class="commentSection" *ngFor='let comment of post.comments ; let j = index'>
+          <div md-card-avatar class="example-header-image commentUserPhoto" [ngStyle]="{'background-image': 'url(' + comment.photoUrl + ')'}"></div>
+          <div class="commentContents">
+            <span><strong>{{comment.userName}}</strong> {{comment.comment}}</span>
+            <span class="commentInterface">
+              {{humanizeDate(comment.createdAt)}}
+              <a md-button *ngIf="comment.userId === currentUser._id" (click)="deleteComment(i,j)"> DELETE</a>
+            </span>
+          </div>
+        </div>
+      </md-card-content>
       <md-card-actions>
         <button md-button (click)="commentBtn(i)"><i class="material-icons">comment</i> COMMENT</button>
-        <!-- <button md-button><i class="material-icons">share</i> SHARE</button> -->
-        <button md-button *ngIf="currentUser._id === post.userId" (click)="deletePostBtn(i)">
+        <button md-button *ngIf="currentUser._id === post.userId" (click)="deletePostBtn(i,j)">
           <i class="material-icons">delete</i> DELETE</button>
       </md-card-actions>
-      <div class="comments" *ngIf="post.commentEnabled">
+      <form class="commentInput" (ngSubmit)="addComment(i)" *ngIf="post.commentEnabled">
         <md-input-container>
-          <input mdInput focused placeholder="Comment">
+          <input mdInput class="mdInput" focused placeholder="Comment"
+          (click)='commentUpdate($event)' (keyup)="commentUpdate($event)"
+          (click.enter)="cleanUpCommentInput($event)" (keyup.enter)="cleanUpCommentInput($event)">
         </md-input-container>
-      </div>
+      </form>
     </md-card>
+    <div style="padding: 15px 0"></div>
   </div>
 
 </section>

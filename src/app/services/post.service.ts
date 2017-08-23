@@ -64,4 +64,29 @@ export class PostService {
     .then(res => res.json());
   }
 
+
+  // body={ userId,userName,photoUrl,comment,postId}
+  addComment(body){
+    return this.http
+    .patch(
+      environment.apiBase + '/api/addcomment',
+      body,
+      { withCredentials: true }
+    )
+    .toPromise()
+    .then(res=>res.json());
+  }
+
+  // body ={postId, commentId}
+  deleteComment(body){
+    return this.http
+    .patch(
+      environment.apiBase + '/api/deletecomment',
+      body,
+      { withCredentials: true }
+    )
+    .toPromise()
+    .then(res=>res.json());
+  }
+
 }
