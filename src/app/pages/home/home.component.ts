@@ -533,8 +533,11 @@ export class HomeComponent implements OnInit {
 
   viewAlarm(){
     this.toFeedBoolean = false;
+    this.toDevBoolean = false;
     this.toAlarmBoolean = true;
     this.navContainer.close();
+    this.showYtVideo = false;
+    this.player = undefined;
   }
 
   refreshPost(res){
@@ -572,8 +575,18 @@ export class HomeComponent implements OnInit {
       console.log(this.posts);
       this.toFeedBoolean = true;
       this.toAlarmBoolean = false;
+      this.toDevBoolean = false;
       this.navContainer.close();
     });
+  }
+
+  toDevBoolean: boolean =false;
+
+  viewDeokjae(){
+    this.toFeedBoolean = false;
+    this.toAlarmBoolean = false;
+    this.toDevBoolean = true;
+    this.navContainer.close();
   }
 
   commentBtn(i){
@@ -626,8 +639,16 @@ export class HomeComponent implements OnInit {
   }
 
   playYtFromPost(i){
-    // this.ytId = this.posts[i].soundSet.id;
-    // this.showYtVideo=true;
+    this.ytId = this.posts[i].soundSet.id;
+    if(this.player){
+      this.player.loadVideoById(this.ytId);
+    }
+    else{
+      this.showYtVideo=true;
+      setTimeout(()=>{
+        if(this.player){this.player.playVideo();}
+      },1500);
+    }
   }
 
   //i is index of posts
@@ -865,9 +886,13 @@ export class HomeComponent implements OnInit {
   ringIt(){
     this.background.switchBackground();
     this.ringingViewBoolean = true;
+
     console.log(this.set);
     this.ytId = this.ytIdTemp;
     this.showYtVideo = true;
+    if(this.player){
+      this.player.loadVideoById(this.ytId);
+    }
     this.set = undefined;
     $('.ytOverlap').addClass('removeAllEvents');
     setTimeout(()=>{
@@ -988,6 +1013,7 @@ export class HomeComponent implements OnInit {
         this.ringingViewBoolean = false;
         this.showYtVideo = false;
         this.ytVideoPlayed = false;
+        this.player = undefined;
         this.cameraTurnedOnFromChild = false;
         this.isDetectionDone = false;
         this.firstDetected = false;

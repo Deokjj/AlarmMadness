@@ -20,10 +20,6 @@
 
   <md-spinner *ngIf="launched && progress"></md-spinner>
 
-  <!-- [style.background-image]="base64?'url('+base64+')':null" -->
-
-
-
   <form (ngSubmit)="signUp()" *ngIf="proceedToSignUpBoolean">
 
     <md-input-container class="input-width">
@@ -129,10 +125,6 @@
         <i class="material-icons">alarm</i>
         <span>Alarm</span>
       </button>
-      <!-- <button md-button>&nbsp;
-        <img [src]="currentUser.photoUrl">
-        Profile
-      </button> -->
       <button md-button (click)="viewFeed()">&nbsp;
         <i class="material-icons">face</i>
         Feed
@@ -140,6 +132,10 @@
       <button md-button (click)="logOut()">
         <i class="material-icons">subdirectory_arrow_left</i>&nbsp;
         Log Out
+      </button>
+      <button md-button class="deokjae" (click)="viewDeokjae()">&nbsp;
+        <img src="https://scontent-mia3-2.xx.fbcdn.net/v/t31.0-8/19800803_1396473863771304_8298855756804221619_o.jpg?oh=ab7028179bd8365259ea67e3475b1086&oe=5A1F7D86">
+        Who Dev?
       </button>
 
     </md-sidenav>
@@ -289,7 +285,7 @@
 
   <md-spinner *ngIf="unlocking && progress "></md-spinner>
 
-  <div class="feed" *ngIf="toFeedBoolean">
+  <div class="feed" *ngIf="toFeedBoolean && !ringingViewBoolean">
     <!-- <md-card>
       <img md-card-image [src]="currentUser.photoUrl">
       <md-card-header>
@@ -310,7 +306,7 @@
         <md-card-subtitle *ngIf="post.timeSet">
           Unlocked at <strong>{{post.createdAt}}</strong>
           <br>
-          <span (click) = 'playYtFromPost(i)'><i class="material-icons">music_note</i> {{post.soundSet.title}}</span>
+          <span md-button (click) = 'playYtFromPost(i)'><i class="material-icons">music_note</i> {{post.soundSet.title}}</span>
         </md-card-subtitle>
       </md-card-header>
       <md-card-content *ngIf="!post.timeSet">
@@ -347,11 +343,6 @@
           </div>
         </div>
       </md-card-content>
-      <md-card-actions>
-        <button md-button (click)="commentBtn(i)"><i class="material-icons">comment</i> COMMENT</button>
-        <button md-button *ngIf="currentUser._id === post.userId" (click)="deletePostBtn(i,j)">
-          <i class="material-icons">delete</i> DELETE</button>
-      </md-card-actions>
       <form class="commentInput" (ngSubmit)="addComment(i)" *ngIf="post.commentEnabled">
         <md-input-container>
           <input mdInput class="mdInput" focused placeholder="Comment"
@@ -359,8 +350,43 @@
           (click.enter)="cleanUpCommentInput($event)" (keyup.enter)="cleanUpCommentInput($event)">
         </md-input-container>
       </form>
+      <md-card-actions>
+        <button md-button (click)="commentBtn(i)"><i class="material-icons">comment</i> COMMENT</button>
+        <button md-button style="colore:red" *ngIf="post.timeSet" (click) = 'playYtFromPost(i)'>
+          <img style="height:30px;" src="../../assets/youtube.png">
+          YOUTUBE
+        </button>
+        <button md-button *ngIf="currentUser._id === post.userId" (click)="deletePostBtn(i,j)">
+          <i class="material-icons">delete</i> DELETE</button>
+      </md-card-actions>
     </md-card>
     <div style="padding: 15px 0"></div>
+  </div>
+
+  <div class="dev" *ngIf="toDevBoolean && !ringingViewBoolean">
+
+    <div class="devContent">
+      <div class="deokjaeImg"></div>
+    </div>
+    <h1>DEOKJAE</h1>
+    <div class="icons">
+      <a md-button href="https://github.com/Deokjj" target="_blank">
+        <div class='icon github'></div> </a>
+      <a md-button href="https://www.linkedin.com/in/deokj" target="_blank">
+        <div class='icon linkedin'></div> </a>
+      <a md-button class="gitrepo" href="https://github.com/Deokjj/AlarmMadness" target="_blank">
+        <div class="gitrepoIcon"></div>
+         Client.git
+      </a>
+      <a md-button class="gitrepo" href="https://github.com/Deokjj/AlarmMadnessApi" target="_blank">
+        <div class="gitrepoIcon"></div>
+         Server.git
+      </a>
+      <a md-button class="gitrepo" href="https://youtu.be/GhnBJbq0Enw" target="_blank">
+        <div class="demoVid"></div>
+         Demo
+      </a>
+    </div>
   </div>
 
 </section>

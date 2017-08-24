@@ -73,7 +73,7 @@ export class YoutubeSearchComponent implements OnInit {
     else{
       setTimeout(()=>{
         if(this.player){this.player.playVideo();}
-      },1000);
+      },1500);
     }
   }
 
