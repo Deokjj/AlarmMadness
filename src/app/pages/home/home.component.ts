@@ -587,6 +587,8 @@ export class HomeComponent implements OnInit {
     this.toAlarmBoolean = false;
     this.toDevBoolean = true;
     this.navContainer.close();
+    this.showYtVideo = false;
+    this.player = undefined;
   }
 
   commentBtn(i){
